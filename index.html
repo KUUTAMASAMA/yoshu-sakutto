@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="予習サクッと">
+<meta name="theme-color" content="#2f6f5e">
+<title>予習サクッと</title>
+<meta name="description" content="写真とAIで予習を30分に。単語カードとまとめで授業前もバッチリ">
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --text: #1f2328;
+    --sub: #62676d;
+    --line: #e4e0d8;
+    --accent: #2f6f5e;
+    --accent-soft: #e3efe9;
+    --warm: #c0643c;
+    --warm-soft: #f8e8df;
+    --line-green: #06c755;
+    --tabbar: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17191c;
+      --card: #22252a;
+      --text: #eceae6;
+      --sub: #a3a7ad;
+      --line: #34383e;
+      --accent: #6fbfa6;
+      --accent-soft: #24352f;
+      --warm: #e38c64;
+      --warm-soft: #3a2a22;
+      --tabbar: #1d2024;
+    }
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+    line-height: 1.65;
+    -webkit-text-size-adjust: 100%;
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 16px 16px calc(96px + env(safe-area-inset-bottom)); }
+  h1 { font-size: 1.3rem; margin: 4px 0 12px; }
+  h2 { font-size: 1.05rem; margin: 0 0 10px; }
+  p { margin: 0 0 10px; }
+  .sub { color: var(--sub); font-size: .88rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .tag {
+    display: inline-block;
+    background: var(--accent-soft); color: var(--accent);
+    font-size: .78rem; font-weight: 700;
+    padding: 1px 10px; border-radius: 99px;
+  }
+  button, a.btn { font: inherit; -webkit-tap-highlight-color: transparent; }
+  button { border: none; cursor: pointer; }
+  .btn {
+    display: block; width: 100%; text-align: center; text-decoration: none;
+    padding: 14px; border-radius: 14px;
+    font-size: 1rem; font-weight: 700;
+    background: var(--accent); color: #fff;
+  }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+  .btn.plain { background: transparent; color: var(--sub); border: 1px solid var(--line); font-weight: 500; }
+  .btn.line { background: var(--line-green); color: #fff; }
+  .btn.small { display: inline-block; width: auto; padding: 6px 12px; font-size: .85rem; border-radius: 10px; }
+  .btn:active { transform: scale(.98); }
+  .row { display: flex; gap: 10px; }
+  .row > * { flex: 1; }
+
+  /* 数字タイル */
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .tile {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 10px 6px; text-align: center;
+  }
+  .tile b { display: block; font-size: 1.6rem; line-height: 1.2; }
+  .tile span { font-size: .75rem; color: var(--sub); }
+
+  /* 教科ボタン */
+  .subjects { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .subj {
+    background: var(--card); color: var(--text);
+    border: 2px solid var(--line); border-radius: 16px;
+    padding: 18px 8px; font-size: 1.05rem; font-weight: 700;
+  }
+  .subj small { display: block; font-size: .75rem; color: var(--sub); font-weight: 500; }
+  .subj:active { border-color: var(--accent); }
+
+  /* 予習中 */
+  .timer {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--accent); color: #fff; border-radius: 16px;
+    padding: 12px 16px; margin-bottom: 14px;
+  }
+  .timer b { font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+  .timer span { font-size: .85rem; opacity: .9; }
+  .step { display: flex; gap: 12px; }
+  .step + .step { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--line); }
+  .step .no {
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #fff; display: grid; place-items: center;
+    font-size: .85rem; font-weight: 700;
+  }
+  .step .body { flex: 1; min-width: 0; }
+  .step h3 { font-size: 1rem; margin: 2px 0 6px; }
+  details { margin-top: 8px; }
+  summary { color: var(--accent); font-size: .88rem; cursor: pointer; }
+  pre.prompt {
+    white-space: pre-wrap; overflow-wrap: anywhere;
+    font-family: inherit; font-size: .82rem;
+    background: var(--bg); border: 1px dashed var(--line);
+    border-radius: 12px; padding: 10px; margin: 8px 0 0;
+  }
+  textarea, input[type=number] {
+    width: 100%; font: inherit; font-size: 16px;
+    padding: 10px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--text);
+  }
+  textarea { min-height: 110px; resize: vertical; }
+  .saved {
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 12px; padding: 10px 12px; font-size: .9rem; font-weight: 700; margin-top: 10px;
+  }
+  .warn { background: var(--warm-soft); color: var(--warm); }
+  .extra { border-top: 1px solid var(--line); padding: 12px 0; }
+  .extra:first-of-type { border-top: none; padding-top: 0; }
+  .extra h3 { font-size: .95rem; margin: 0 0 2px; }
+
+  /* チップ */
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; border: 1px solid var(--line); background: var(--card); color: var(--text);
+    border-radius: 99px; padding: 5px 12px; font-size: .85rem;
+  }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* クイズ */
+  .flash {
+    min-height: 230px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; gap: 10px;
+  }
+  .flash .front { font-size: 1.6rem; font-weight: 700; overflow-wrap: anywhere; }
+  .flash .back { font-size: 1.1rem; color: var(--accent); font-weight: 700; overflow-wrap: anywhere; }
+  .qcount { display: flex; justify-content: space-between; font-size: .85rem; color: var(--sub); margin-bottom: 8px; }
+  .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .judge button { padding: 18px 8px; border-radius: 16px; font-size: 1.1rem; font-weight: 700; }
+  .judge .ok { background: var(--accent); color: #fff; }
+  .judge .ng { background: var(--warm); color: #fff; }
+  .result-big { font-size: 3rem; font-weight: 800; text-align: center; color: var(--accent); margin: 8px 0; }
+
+  /* まとめ・カード一覧 */
+  .note { border-top: 1px solid var(--line); padding: 12px 0; }
+  .note:first-child { border-top: none; padding-top: 0; }
+  .note-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .note-head .date { color: var(--sub); font-size: .82rem; flex: 1; }
+  .note ul { margin: 0; padding-left: 1.2em; }
+  .note li { margin-bottom: 2px; }
+  .link-del { background: none; color: var(--sub); font-size: .78rem; padding: 2px 4px; text-decoration: underline; }
+  .empty { color: var(--sub); font-size: .9rem; text-align: center; padding: 16px 0; }
+  .clist { font-size: .9rem; }
+  .clist div { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .clist div span:first-child { flex: 1; font-weight: 700; overflow-wrap: anywhere; }
+  .clist div span:nth-child(2) { flex: 1.3; color: var(--sub); overflow-wrap: anywhere; }
+
+  /* グラフ */
+  .chart { position: relative; height: 160px; margin: 8px 0 4px; }
+  .bars { position: absolute; inset: 0; display: flex; align-items: flex-end; gap: 2px; }
+  .bars .col {
+    flex: 1; height: 100%; display: flex; align-items: flex-end; justify-content: center;
+    background: none; padding: 0; position: relative;
+  }
+  .bars .bar { width: 70%; max-width: 18px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 0; }
+  .bars .col.sel .bar { outline: 2px solid var(--text); outline-offset: 1px; }
+  .goal {
+    position: absolute; left: 0; right: 0; z-index: 2;
+    border-top: 1.5px dashed var(--warm); pointer-events: none;
+  }
+  .goal span {
+    position: absolute; left: 0; top: -22px; font-size: .72rem; color: var(--warm); font-weight: 700;
+    background: var(--card); padding: 0 4px; border-radius: 4px;
+  }
+  .baseline { position: absolute; left: 0; right: 0; bottom: 0; border-top: 1px solid var(--line); }
+  .xlabels { display: flex; gap: 2px; font-size: .68rem; color: var(--sub); text-align: center; }
+  .xlabels span { flex: 1; }
+  .xlabels span.today { color: var(--text); font-weight: 700; }
+  .chart-info { font-size: .88rem; min-height: 1.5em; margin-top: 6px; }
+
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .seg button { flex: 1; padding: 10px; background: var(--card); color: var(--text); font-size: .95rem; }
+  .seg button.on { background: var(--accent); color: #fff; font-weight: 700; }
+
+  /* タブ */
+  nav.tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    background: var(--tabbar); border-top: 1px solid var(--line);
+    display: flex; justify-content: center;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav.tabs button {
+    flex: 1; max-width: 140px; background: none; color: var(--sub);
+    padding: 8px 2px 10px; font-size: .75rem;
+  }
+  nav.tabs button b { display: block; font-size: 1.25rem; line-height: 1.3; }
+  nav.tabs button.on { color: var(--accent); font-weight: 700; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    background: var(--text); color: var(--bg);
+    padding: 10px 18px; border-radius: 99px; font-size: .9rem; z-index: 10;
+    opacity: 0; pointer-events: none; transition: opacity .2s; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ===== 予習 ===== -->
+  <section id="tab-home">
+    <div id="home-idle">
+      <h1>予習サクッと</h1>
+      <div class="tiles">
+        <div class="tile"><b id="t-streak">0</b><span>連続日数</span></div>
+        <div class="tile"><b id="t-today">0</b><span>今日の予習（分）</span></div>
+        <div class="tile"><b id="t-cards">0</b><span>覚えたカード</span></div>
+      </div>
+
+      <div class="card">
+        <h2>今日はどの教科を予習する？</h2>
+        <div class="subjects" id="subjects"></div>
+        <p class="sub" style="margin:10px 0 0">押すとタイマーがスタート。1教科10分が目安だよ。</p>
+      </div>
+
+      <div class="card">
+        <h2>こんなときは</h2>
+        <div class="extra">
+          <h3>問題がわからない</h3>
+          <p class="sub">答えは教えず、ヒントを1つずつ出してもらう</p>
+          <button class="btn small ghost" data-extra="hint">お願い文をコピーして開く</button>
+        </div>
+        <div class="extra">
+          <h3>週末：先生役モード</h3>
+          <p class="sub">習ったことをAIに説明して、まちがいを見つけてもらう</p>
+          <button class="btn small ghost" data-extra="teach">お願い文をコピーして開く</button>
+        </div>
+        <div class="extra">
+          <h3>中学の内容があやふや</h3>
+          <p class="sub">中学の内容を3行で説明して、確認問題を出してもらう</p>
+          <button class="btn small ghost" data-extra="junior">お願い文をコピーして開く</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="home-active" hidden>
+      <div class="timer">
+        <div><span id="a-subj">英語</span><br><span>予習中</span></div>
+        <b id="a-time">0:00</b>
+      </div>
+
+      <div class="card">
+        <div class="step">
+          <div class="no">1</div>
+          <div class="body">
+            <h3>お願い文をコピーしてAIを開く</h3>
+            <a class="btn" id="a-open" href="https://chatgpt.com/" target="_blank" rel="noopener">コピーして <span class="ai-name">ChatGPT</span> を開く</a>
+            <details>
+              <summary>お願い文を見る</summary>
+              <pre class="prompt" id="a-prompt"></pre>
+            </details>
+          </div>
+        </div>
+        <div class="step">
+          <div class="no">2</div>
+          <div class="body">
+            <h3>教科書を撮って送る</h3>
+            <p class="sub" style="margin:0"><span class="ai-name">ChatGPT</span> で「＋」→ カメラで教科書のページを撮る → 入力欄を長押しして「ペースト」→ 送信</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="no">3</div>
+          <div class="body">
+            <h3>ヒントを見て自分で考える</h3>
+            <p class="sub" style="margin:0" id="a-tip"></p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="no">4</div>
+          <div class="body">
+            <h3>AIの返事をここに貼る</h3>
+            <p class="sub">AIの返事を長押し →「コピー」→ 下に貼りつけ。単語カードとまとめが自動で保存されるよ。</p>
+            <textarea id="a-paste" placeholder="ここに貼りつけ"></textarea>
+            <button class="btn ghost" id="a-save" style="margin-top:8px">カードとまとめを保存</button>
+            <div id="a-saved" hidden></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="finish-box">
+        <h2>予習おわり！</h2>
+        <div class="row" style="align-items:center">
+          <span style="flex:none">かかった時間</span>
+          <input type="number" id="a-min" min="1" max="180" inputmode="numeric" style="flex:1">
+          <span style="flex:none">分</span>
+        </div>
+        <button class="btn" id="a-finish" style="margin-top:12px">記録する</button>
+        <button class="btn plain" id="a-cancel" style="margin-top:8px">やめる（記録しない）</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== クイズ ===== -->
+  <section id="tab-quiz" hidden>
+    <h1>単語クイズ</h1>
+    <div class="chips" id="quiz-chips"></div>
+    <div id="quiz-start" class="card">
+      <p id="quiz-info"></p>
+      <button class="btn" id="quiz-go">10問スタート</button>
+      <p class="sub" style="margin:10px 0 0">電車の中で5分。まだ覚えていないカードから出るよ。</p>
+    </div>
+    <div id="quiz-play" hidden>
+      <div class="qcount"><span id="q-no"></span><span id="q-subj"></span></div>
+      <div class="card flash">
+        <div class="front" id="q-front"></div>
+        <div class="back" id="q-back" hidden></div>
+      </div>
+      <button class="btn" id="q-show">答えを見る</button>
+      <div class="judge" id="q-judge" hidden>
+        <button class="ng" id="q-ng">まだ ×</button>
+        <button class="ok" id="q-ok">覚えた ○</button>
+      </div>
+      <button class="link-del" id="q-quit" style="display:block;margin:14px auto 0">クイズをやめる</button>
+    </div>
+    <div id="quiz-end" class="card" hidden>
+      <p style="text-align:center;margin:0">今回の結果</p>
+      <div class="result-big" id="q-result"></div>
+      <p class="sub" style="text-align:center" id="q-comment"></p>
+      <button class="btn" id="q-again">もう一回</button>
+    </div>
+    <details class="card">
+      <summary>カードの一覧を見る</summary>
+      <div class="clist" id="card-list" style="margin-top:10px"></div>
+    </details>
+  </section>
+
+  <!-- ===== まとめ ===== -->
+  <section id="tab-notes" hidden>
+    <h1>授業前のまとめ</h1>
+    <p class="sub">授業の前の5分で見返そう。当てられても大丈夫。</p>
+    <div class="chips" id="note-chips"></div>
+    <div class="card" id="note-list"></div>
+  </section>
+
+  <!-- ===== 記録 ===== -->
+  <section id="tab-log" hidden>
+    <h1>記録</h1>
+    <div class="tiles">
+      <div class="tile"><b id="l-streak">0</b><span>連続日数</span></div>
+      <div class="tile"><b id="l-days">0</b><span>7日間で予習</span></div>
+      <div class="tile"><b id="l-avg">0</b><span>1日の平均（分）</span></div>
+    </div>
+    <div class="card">
+      <h2>毎日の予習時間（分）</h2>
+      <p class="sub" style="margin:0 0 16px">最近14日間（太字の日付が今日）。棒を押すとくわしく見られるよ。</p>
+      <div class="chart" id="chart">
+        <div class="baseline"></div>
+        <div class="goal" id="goal"><span>目標30分</span></div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="xlabels" id="xlabels"></div>
+      <div class="chart-info" id="chart-info"></div>
+    </div>
+    <div class="card">
+      <h2>がんばりを報告する</h2>
+      <p class="sub">この1週間の記録を、相談している人にLINEで送れるよ。</p>
+      <button class="btn line" id="report">LINEで報告する</button>
+    </div>
+    <div class="card">
+      <h2>使うAI</h2>
+      <div class="seg" id="ai-seg">
+        <button data-ai="chatgpt">ChatGPT</button>
+        <button data-ai="gemini">Gemini</button>
+      </div>
+      <p class="sub" style="margin:10px 0 0">「コピーして開く」を押したときに開くAIです。</p>
+    </div>
+    <div class="card">
+      <h2>ホーム画面に置く</h2>
+      <p class="sub" style="margin:0">Safariでこのページを開いて、下の「共有」ボタン（□に↑）→「ホーム画面に追加」。アプリみたいにすぐ開けるよ。</p>
+    </div>
+    <div class="card">
+      <h2>データ</h2>
+      <p class="sub">記録はこのスマホの中だけに保存されます。機種変更の前は「書き出し」でバックアップしてね。</p>
+      <div class="row">
+        <button class="btn small ghost" id="export">書き出し</button>
+        <button class="btn small ghost" id="import-btn">読み込み</button>
+        <button class="btn small plain" id="reset">全部消す</button>
+      </div>
+      <input type="file" id="import" accept="application/json,.json" hidden>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="home" class="on"><b>📷</b>予習</button>
+  <button data-tab="quiz"><b>🃏</b>クイズ</button>
+  <button data-tab="notes"><b>📝</b>まとめ</button>
+  <button data-tab="log"><b>📊</b>記録</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+// ================= 設定 =================
+const SUBJECTS = [
+  { k: "en", name: "英語", note: "単語・和訳", card: "英単語・熟語｜意味" },
+  { k: "ma", name: "数学", note: "例題・公式", card: "公式・用語｜意味や使い方" },
+  { k: "ge", name: "現代文", note: "言葉・読解", card: "言葉｜意味" },
+  { k: "ko", name: "古文・漢文", note: "古語・訳", card: "古語・句法｜意味" },
+];
+const AI = {
+  chatgpt: { name: "ChatGPT", url: "https://chatgpt.com/" },
+  gemini: { name: "Gemini", url: "https://gemini.google.com/app" },
+};
+const GOAL = 30;
+const STORE_KEY = "yoshu-sakutto-v1";
+
+const TAIL = (s) => `
+最後に、アプリに保存するので、次の形で必ず出してください。
+【まとめ】
+・授業の前に見返すポイントを3つ（1行に1つ）
+【カード】
+${s.card}
+（1行に1つ、10個まで。表にしないで「｜」で区切る）`;
+
+const PROMPTS = {
+  en: s => `あなたは高校1年生向けの英語の先生です。
+写真は、明日の授業で習う教科書のページです。予習を手伝ってください。
+
+1. 1文ずつ、意味をつかむためのヒントを出してください。まだ全文の訳は出さないでください。
+2. 大事な文法を1つだけ、かんたんに説明してください。
+3. 授業で先生に聞かれそうな質問を3つ出してください（答えはまだ出さない）。
+
+私が「答え合わせ」と送ったら、全文の訳と質問の答えを出してください。
+${TAIL(s)}`,
+  ma: s => `あなたは高校1年生向けの数学の先生です。
+写真は、明日の授業で習う教科書のページです。予習を手伝ってください。
+
+1. このページで習うことを、中学生にもわかる言葉で3行で説明してください。
+2. 例題の解き方を、ヒントとして1段ずつ出してください。一気に答えを出さないでください。
+3. このページを理解するのに必要な中学の内容があれば、1つだけ教えてください。
+
+私が「次」と送ったら次のヒントを、「答え合わせ」と送ったら解き方の全体を出してください。
+${TAIL(s)}`,
+  ge: s => `あなたは高校1年生向けの国語（現代文）の先生です。
+写真は、明日の授業で読む文章です。予習を手伝ってください。
+
+1. 読み方や意味がむずかしい言葉を選んで、かんたんに説明してください。
+2. 筆者がいちばん言いたいことを見つけるためのヒントを出してください（答えはまだ出さない）。
+3. 授業で先生に聞かれそうな質問を3つ出してください（答えはまだ出さない）。
+
+私が「答え合わせ」と送ったら、段落ごとの要約と質問の答えを出してください。
+${TAIL(s)}`,
+  ko: s => `あなたは高校1年生向けの古文・漢文の先生です。
+写真は、明日の授業で読む教科書のページです。予習を手伝ってください。
+
+1. 大事な古語（漢文なら大事な漢字や句法）を選んで、意味を説明してください。
+2. 大事な文法（助動詞や返り点など）を1つだけ、かんたんに説明してください。
+3. 1文ずつ、現代語訳のヒントを出してください。まだ全文の訳は出さないでください。
+
+私が「答え合わせ」と送ったら、全文の現代語訳を出してください。
+${TAIL(s)}`,
+};
+const TIPS = {
+  en: "ヒントを見て、まず自分で訳してみる。むずかしければ「答え合わせ」と送ってOK。",
+  ma: "ヒントを見て例題を解いてみる。つまったら「次」と送ると、次のヒントが出るよ。",
+  ge: "筆者の言いたいことを自分の言葉で1行書いてから「答え合わせ」と送ろう。",
+  ko: "ヒントを見て訳してみる。むずかしければ「答え合わせ」と送ってOK。",
+};
+const EXTRAS = {
+  hint: `高校1年生です。写真の問題がわかりません。
+答えはすぐに教えないでください。ヒントを1つずつ出して、私が自分で解けるように手伝ってください。
+私が「降参」と送ったときだけ、解き方を最初から説明してください。`,
+  teach: `今から私が、今週の授業で習ったことをあなたに説明します。あなたは生徒の役です。
+私の説明にまちがいや足りないところがあれば、質問する形で教えてください。
+最後に、私の理解度を5段階で教えて、もう一度確認するとよいところを1つ教えてください。
+では説明します：`,
+  junior: `高校1年生です。授業で、中学で習った「（ここに内容を書く）」があやふやです。
+中学生にもわかる言葉で3行で説明して、確認問題を3問出してください。
+答えは、私が答えを送ってから教えてください。`,
+};
+
+// ================= データ =================
+function blank() {
+  return { ai: "chatgpt", sessions: [], cards: [], notes: [], active: null };
+}
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (d && Array.isArray(d.cards)) return Object.assign(blank(), d);
+  } catch (e) {}
+  return blank();
+}
+let state = load();
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+// ================= 小道具 =================
+const $ = id => document.getElementById(id);
+const WD = ["日", "月", "火", "水", "木", "金", "土"];
+const subjOf = k => SUBJECTS.find(s => s.k === k) || SUBJECTS[0];
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+function ymd(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function parseYmd(s) { const p = s.split("-"); return new Date(+p[0], p[1] - 1, +p[2]); }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function md(d) { return `${d.getMonth() + 1}/${d.getDate()}(${WD[d.getDay()]})`; }
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast.h);
+  toast.h = setTimeout(() => t.classList.remove("show"), 2200);
+}
+function copyText(text) {
+  // タップの直後に同期的にコピーする（iPhoneでも確実に動くように）
+  let ok = false;
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  try { ok = document.execCommand("copy"); } catch (e) {}
+  ta.remove();
+  if (!ok && navigator.clipboard) {
+    navigator.clipboard.writeText(text).catch(() => {});
+    ok = true;
+  }
+  return ok;
+}
+function currentAI() { return AI[state.ai] || AI.chatgpt; }
+
+// ================= 集計 =================
+function minutesOn(dateStr) {
+  return state.sessions.filter(s => s.date === dateStr).reduce((a, s) => a + s.min, 0);
+}
+function studied(dateStr) { return state.sessions.some(s => s.date === dateStr); }
+function streak() {
+  let d = new Date(), n = 0;
+  if (!studied(ymd(d))) d = addDays(d, -1); // 今日まだなら昨日から数える
+  while (studied(ymd(d))) { n++; d = addDays(d, -1); }
+  return n;
+}
+function knownCount() { return state.cards.filter(c => c.known).length; }
+
+// ================= AIの返事を読み取る =================
+function section(text, name) {
+  const mark = "【" + name + "】";
+  const i = text.lastIndexOf(mark);
+  if (i < 0) return "";
+  const rest = text.slice(i + mark.length);
+  const end = rest.indexOf("【");
+  return end >= 0 ? rest.slice(0, end) : rest;
+}
+function cleanLine(line) {
+  return line.replace(/^\s*(?:[-・*•●◦]|\d+[.)．、]|[（(]\d+[)）])\s*/, "").trim();
+}
+function parseReply(raw, subjectKey) {
+  const text = raw.replace(/\r/g, "").replace(/\*\*/g, "").replace(/`/g, "");
+  const cardPart = section(text, "カード") || text;
+  const cards = [];
+  cardPart.split("\n").forEach(line => {
+    if (!/[|｜]/.test(line)) return;
+    if (/^[\s|｜:：\-ー—]+$/.test(line)) return; // 表の区切り線
+    const parts = line.split(/[|｜]/).map(cleanLine).filter(Boolean);
+    if (parts.length < 2) return;
+    const front = parts[0].slice(0, 80);
+    const back = parts.slice(1).join(" / ").slice(0, 200);
+    if (/^意味/.test(back) || /^(単語|英単語|古語|言葉|用語|公式)/.test(front) && /意味/.test(back)) return; // 見出し行
+    cards.push({ front, back });
+  });
+  const points = section(text, "まとめ").split("\n")
+    .map(cleanLine)
+    .filter(l => l && !/[|｜]/.test(l) && !/ポイントを3つ/.test(l))
+    .slice(0, 5)
+    .map(l => l.slice(0, 200));
+  return { cards, points };
+}
+
+// ================= 予習タブ =================
+function renderHome() {
+  $("t-streak").textContent = streak();
+  $("t-today").textContent = minutesOn(ymd(new Date()));
+  $("t-cards").textContent = knownCount();
+  $("subjects").innerHTML = SUBJECTS.map(s =>
+    `<button class="subj" data-subj="${s.k}">${s.name}<small>${s.note}</small></button>`).join("");
+  document.querySelectorAll(".ai-name").forEach(el => el.textContent = currentAI().name);
+
+  const a = state.active;
+  $("home-idle").hidden = !!a;
+  $("home-active").hidden = !a;
+  if (a) {
+    const s = subjOf(a.subject);
+    $("a-subj").textContent = s.name;
+    $("a-prompt").textContent = PROMPTS[s.k](s);
+    $("a-tip").textContent = TIPS[s.k];
+    $("a-open").href = currentAI().url;
+    if ($("a-paste").value !== (a.draft || "")) $("a-paste").value = a.draft || "";
+    tick();
+  }
+}
+function elapsedMin() {
+  if (!state.active) return 0;
+  return Math.max(1, Math.round((Date.now() - state.active.start) / 60000));
+}
+function tick() {
+  if (!state.active) return;
+  const sec = Math.floor((Date.now() - state.active.start) / 1000);
+  const m = Math.floor(sec / 60), s = sec % 60;
+  $("a-time").textContent = `${m}:${String(s).padStart(2, "0")}`;
+  if (document.activeElement !== $("a-min")) $("a-min").value = Math.min(180, elapsedMin());
+}
+setInterval(tick, 1000);
+
+$("subjects").addEventListener("click", e => {
+  const b = e.target.closest("[data-subj]");
+  if (!b) return;
+  state.active = { subject: b.dataset.subj, start: Date.now(), draft: "" };
+  save();
+  $("a-saved").hidden = true;
+  renderHome();
+  window.scrollTo(0, 0);
+});
+
+$("a-open").addEventListener("click", () => {
+  const s = subjOf(state.active.subject);
+  copyText(PROMPTS[s.k](s));
+  toast("お願い文をコピーしたよ");
+});
+
+$("a-paste").addEventListener("input", () => {
+  if (!state.active) return;
+  state.active.draft = $("a-paste").value;
+  save();
+});
+
+$("a-save").addEventListener("click", () => {
+  const raw = $("a-paste").value.trim();
+  const box = $("a-saved");
+  box.hidden = false;
+  if (!raw) {
+    box.className = "saved warn";
+    box.textContent = "まだ何も貼られていないよ";
+    return;
+  }
+  const subj = state.active.subject;
+  const { cards, points } = parseReply(raw, subj);
+  const today = ymd(new Date());
+  let added = 0;
+  cards.forEach(c => {
+    const same = state.cards.find(x => x.subject === subj && x.front.toLowerCase() === c.front.toLowerCase());
+    if (same) { same.back = c.back; return; }
+    state.cards.push({ id: uid(), subject: subj, front: c.front, back: c.back, date: today, known: false, last: 0 });
+    added++;
+  });
+  if (points.length) state.notes.unshift({ id: uid(), subject: subj, date: today, points });
+  save();
+  if (!cards.length && !points.length) {
+    box.className = "saved warn";
+    box.textContent = "カードとまとめが見つからなかったよ。AIに「【まとめ】と【カード】の形で出して」と送ってから、もう一度貼ってみて。";
+    return;
+  }
+  box.className = "saved";
+  box.textContent = `保存したよ！ 新しいカード ${added}枚／まとめ ${points.length ? "1件" : "なし"}`;
+  $("a-paste").value = "";
+  state.active.draft = "";
+  save();
+});
+
+$("a-finish").addEventListener("click", () => {
+  const min = Math.max(1, Math.min(180, parseInt($("a-min").value, 10) || elapsedMin()));
+  state.sessions.push({ id: uid(), date: ymd(new Date()), subject: state.active.subject, min });
+  state.active = null;
+  save();
+  renderHome();
+  const today = minutesOn(ymd(new Date()));
+  toast(today <= GOAL ? `おつかれさま！今日は${today}分` : `おつかれさま！今日は合計${today}分`);
+});
+$("a-cancel").addEventListener("click", () => {
+  if (!confirm("この予習は記録しないで終わるよ。いい？")) return;
+  state.active = null;
+  save();
+  renderHome();
+});
+
+document.querySelectorAll("[data-extra]").forEach(b => {
+  b.addEventListener("click", () => {
+    copyText(EXTRAS[b.dataset.extra]);
+    toast("お願い文をコピーしたよ");
+    window.open(currentAI().url, "_blank", "noopener");
+  });
+});
+
+// ================= クイズタブ =================
+let quizFilter = "all";
+let quiz = null;
+
+function chipsHtml(current, counts) {
+  const all = [{ k: "all", name: "すべて" }].concat(SUBJECTS);
+  return all.map(s => `<button class="chip${s.k === current ? " on" : ""}" data-f="${s.k}">${s.name}${counts ? `（${counts(s.k)}）` : ""}</button>`).join("");
+}
+function cardsFor(f) { return state.cards.filter(c => f === "all" || c.subject === f); }
+
+function renderQuiz() {
+  $("quiz-chips").innerHTML = chipsHtml(quizFilter, k => cardsFor(k).length);
+  const list = cardsFor(quizFilter);
+  const notYet = list.filter(c => !c.known).length;
+  const playing = !!quiz && !quiz.done;
+  $("quiz-play").hidden = !playing;
+  $("quiz-end").hidden = !(quiz && quiz.done);
+  $("quiz-start").hidden = !!quiz;
+  if (!list.length) {
+    $("quiz-info").innerHTML = "まだカードがないよ。<br>予習でAIの返事を貼りつけると、ここにカードがたまるよ。";
+    $("quiz-go").hidden = true;
+  } else {
+    $("quiz-info").innerHTML = `カード <b>${list.length}枚</b>（まだ覚えていない <b>${notYet}枚</b>）`;
+    $("quiz-go").hidden = false;
+    $("quiz-go").textContent = `${Math.min(10, list.length)}問スタート`;
+  }
+  $("card-list").innerHTML = list.length
+    ? list.slice().reverse().map(c => `<div><span>${esc(c.front)}</span><span>${esc(c.back)}</span><button class="link-del" data-delcard="${c.id}">消す</button></div>`).join("")
+    : '<p class="empty">まだありません</p>';
+  if (playing) showQ();
+}
+function startQuiz() {
+  const list = cardsFor(quizFilter).slice()
+    .sort((a, b) => (a.known - b.known) || (a.last - b.last));
+  quiz = { items: list.slice(0, 10), i: 0, ok: 0, done: false };
+  renderQuiz();
+}
+function showQ() {
+  const c = quiz.items[quiz.i];
+  $("q-no").textContent = `${quiz.i + 1} / ${quiz.items.length}`;
+  $("q-subj").textContent = subjOf(c.subject).name;
+  $("q-front").textContent = c.front;
+  $("q-back").textContent = c.back;
+  $("q-back").hidden = true;
+  $("q-show").hidden = false;
+  $("q-judge").hidden = true;
+}
+function judge(ok) {
+  const c = quiz.items[quiz.i];
+  const real = state.cards.find(x => x.id === c.id);
+  if (real) { real.known = ok; real.last = Date.now(); }
+  if (ok) quiz.ok++;
+  save();
+  quiz.i++;
+  if (quiz.i >= quiz.items.length) {
+    quiz.done = true;
+    const n = quiz.items.length;
+    $("q-result").textContent = `${quiz.ok} / ${n}`;
+    $("q-comment").textContent = quiz.ok === n ? "全問正解！すごい！" : quiz.ok >= n / 2 ? "いい感じ！×のカードはまた出るよ" : "×のカードはまた出るから大丈夫。くり返せば覚えられる";
+  }
+  renderQuiz();
+}
+$("quiz-chips").addEventListener("click", e => {
+  const b = e.target.closest("[data-f]");
+  if (!b) return;
+  quizFilter = b.dataset.f;
+  quiz = null;
+  renderQuiz();
+});
+$("quiz-go").addEventListener("click", startQuiz);
+$("q-show").addEventListener("click", () => {
+  $("q-back").hidden = false;
+  $("q-show").hidden = true;
+  $("q-judge").hidden = false;
+});
+$("q-ok").addEventListener("click", () => judge(true));
+$("q-ng").addEventListener("click", () => judge(false));
+$("q-quit").addEventListener("click", () => { quiz = null; renderQuiz(); });
+$("q-again").addEventListener("click", startQuiz);
+$("card-list").addEventListener("click", e => {
+  const id = e.target.dataset.delcard;
+  if (!id) return;
+  if (!confirm("このカードを消す？")) return;
+  state.cards = state.cards.filter(c => c.id !== id);
+  save();
+  renderQuiz();
+});
+
+// ================= まとめタブ =================
+let noteFilter = "all";
+function renderNotes() {
+  $("note-chips").innerHTML = chipsHtml(noteFilter);
+  const list = state.notes.filter(n => noteFilter === "all" || n.subject === noteFilter);
+  $("note-list").innerHTML = list.length ? list.map(n => `
+    <div class="note">
+      <div class="note-head">
+        <span class="tag">${esc(subjOf(n.subject).name)}</span>
+        <span class="date">${md(parseYmd(n.date))} の予習</span>
+        <button class="link-del" data-delnote="${n.id}">消す</button>
+      </div>
+      <ul>${n.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+    </div>`).join("")
+    : '<p class="empty">まだまとめがないよ。<br>予習でAIの返事を貼りつけると、ここにたまるよ。</p>';
+}
+$("note-chips").addEventListener("click", e => {
+  const b = e.target.closest("[data-f]");
+  if (!b) return;
+  noteFilter = b.dataset.f;
+  renderNotes();
+});
+$("note-list").addEventListener("click", e => {
+  const id = e.target.dataset.delnote;
+  if (!id) return;
+  if (!confirm("このまとめを消す？")) return;
+  state.notes = state.notes.filter(n => n.id !== id);
+  save();
+  renderNotes();
+});
+
+// ================= 記録タブ =================
+let selDay = null;
+function renderLog() {
+  const today = new Date();
+  const last7 = [...Array(7)].map((_, i) => ymd(addDays(today, -i)));
+  const s7 = state.sessions.filter(s => last7.includes(s.date));
+  $("l-streak").textContent = streak();
+  const days7 = last7.filter(studied).length;
+  $("l-days").textContent = days7;
+  // 予習した日の1日あたり（目標30分と比べやすいように）
+  $("l-avg").textContent = days7 ? Math.round(s7.reduce((a, s) => a + s.min, 0) / days7) : 0;
+
+  const days = [...Array(14)].map((_, i) => addDays(today, i - 13));
+  const vals = days.map(d => minutesOn(ymd(d)));
+  const max = Math.max(60, ...vals);
+  $("goal").style.bottom = `${(GOAL / max) * 100}%`;
+  $("bars").innerHTML = days.map((d, i) => {
+    const v = vals[i];
+    const h = v ? Math.max(3, (v / max) * 100) : 0;
+    return `<button class="col${selDay === i ? " sel" : ""}" data-i="${i}" aria-label="${md(d)} ${v}分"><div class="bar" style="height:${h}%"></div></button>`;
+  }).join("");
+  $("xlabels").innerHTML = days.map((d, i) =>
+    `<span class="${i === 13 ? "today" : ""}">${d.getDate()}</span>`).join("");
+  const i = selDay === null ? 13 : selDay;
+  const dayStr = ymd(days[i]);
+  const bySubj = SUBJECTS.map(s => {
+    const m = state.sessions.filter(x => x.date === dayStr && x.subject === s.k).reduce((a, x) => a + x.min, 0);
+    return m ? `${s.name}${m}分` : "";
+  }).filter(Boolean).join("・");
+  $("chart-info").innerHTML = `<b>${md(days[i])}</b>：${vals[i]}分${bySubj ? `（${bySubj}）` : ""}`;
+
+  document.querySelectorAll("#ai-seg button").forEach(b => b.classList.toggle("on", b.dataset.ai === state.ai));
+}
+$("bars").addEventListener("click", e => {
+  const b = e.target.closest("[data-i]");
+  if (!b) return;
+  selDay = +b.dataset.i;
+  renderLog();
+});
+$("ai-seg").addEventListener("click", e => {
+  const b = e.target.closest("[data-ai]");
+  if (!b) return;
+  state.ai = b.dataset.ai;
+  save();
+  renderLog();
+  toast(`${currentAI().name} を使う設定にしたよ`);
+});
+$("report").addEventListener("click", () => {
+  const today = new Date();
+  const days = [...Array(7)].map((_, i) => addDays(today, i - 6));
+  const keys = days.map(ymd);
+  const ss = state.sessions.filter(s => keys.includes(s.date));
+  const total = ss.reduce((a, s) => a + s.min, 0);
+  const studiedDays = keys.filter(studied).length;
+  const perDay = studiedDays ? Math.round(total / studiedDays) : 0;
+  const bySubj = SUBJECTS.map(s => {
+    const n = ss.filter(x => x.subject === s.k).length;
+    return n ? `${s.name}${n}回` : "";
+  }).filter(Boolean).join("・") || "なし";
+  const newCards = state.cards.filter(c => keys.includes(c.date)).length;
+  const text = [
+    "【予習サクッと 報告】",
+    `${md(days[0])}〜${md(days[6])}`,
+    `予習した日：${studiedDays}/7日（連続${streak()}日）`,
+    `予習した日の平均：${perDay}分（目標${GOAL}分）`,
+    `教科：${bySubj}`,
+    `カード：今週${newCards}枚ふえた／全部で${state.cards.length}枚（覚えた${knownCount()}枚）`,
+  ].join("\n");
+  copyText(text);
+  location.href = "https://line.me/R/share?text=" + encodeURIComponent(text);
+});
+$("export").addEventListener("click", () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2)], { type: "application/json" }));
+  a.download = `yoshu-sakutto-${ymd(new Date())}.json`;
+  a.click();
+});
+$("import-btn").addEventListener("click", () => $("import").click());
+$("import").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!Array.isArray(d.cards) || !Array.isArray(d.sessions)) throw 0;
+      state = Object.assign(blank(), d);
+      save();
+      renderLog();
+      toast("読み込んだよ");
+    } catch (err) { toast("読み込めないファイルです"); }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+});
+$("reset").addEventListener("click", () => {
+  if (!confirm("記録・カード・まとめを全部消すよ。元に戻せないけどいい？")) return;
+  state = blank();
+  save();
+  renderLog();
+  toast("全部消したよ");
+});
+
+// ================= タブ切り替え =================
+const RENDER = { home: renderHome, quiz: renderQuiz, notes: renderNotes, log: renderLog };
+function show(tab) {
+  Object.keys(RENDER).forEach(k => $("tab-" + k).hidden = k !== tab);
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+  RENDER[tab]();
+  window.scrollTo(0, 0);
+}
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest("[data-tab]");
+  if (b) show(b.dataset.tab);
+});
+// AIアプリから戻ってきたときに、時間などを最新にする
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") { state = load(); const on = document.querySelector("#tabs button.on"); RENDER[on.dataset.tab](); }
+});
+renderHome();
+</script>
+</body>
+</html>
