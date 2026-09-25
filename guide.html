@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2f6f5e">
+<title>予習サクッと 使い方</title>
+<meta name="description" content="予習サクッとの使い方ガイド。準備から毎日の予習、クイズ、困ったときまで">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --text: #1f2328;
+    --sub: #62676d;
+    --line: #e4e0d8;
+    --accent: #2f6f5e;
+    --accent-soft: #e3efe9;
+    --warm: #c0643c;
+    --warm-soft: #f8e8df;
+    --chat-ai: #eef2f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17191c;
+      --card: #22252a;
+      --text: #eceae6;
+      --sub: #a3a7ad;
+      --line: #34383e;
+      --accent: #6fbfa6;
+      --accent-soft: #24352f;
+      --warm: #e38c64;
+      --warm-soft: #3a2a22;
+      --chat-ai: #2a2f36;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 12px; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+    line-height: 1.75;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 20px 16px calc(48px + env(safe-area-inset-bottom)); }
+  h1 { font-size: 1.55rem; line-height: 1.4; margin: 12px 0 8px; }
+  h2 {
+    font-size: 1.2rem; margin: 48px 0 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .num {
+    display: inline-grid; place-items: center; flex: none;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: .9rem;
+  }
+  h3 { font-size: 1rem; margin: 0 0 4px; }
+  p { margin: 0 0 12px; }
+  .sub { color: var(--sub); font-size: .9rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 16px; padding: 18px; margin-bottom: 12px;
+  }
+  .tag {
+    display: inline-block; background: var(--accent-soft); color: var(--accent);
+    font-size: .78rem; font-weight: 700; padding: 1px 10px; border-radius: 99px;
+  }
+  .tag.warm { background: var(--warm-soft); color: var(--warm); }
+  a { color: var(--accent); }
+  .btn {
+    display: block; text-align: center; text-decoration: none;
+    padding: 14px; border-radius: 14px; font-weight: 700;
+    background: var(--accent); color: #fff;
+  }
+
+  /* もくじ */
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+  .toc a {
+    text-decoration: none; font-size: .85rem; font-weight: 600;
+    background: var(--card); border: 1px solid var(--line); color: var(--text);
+    padding: 4px 12px; border-radius: 99px;
+  }
+
+  /* 3つの場面 */
+  .scene { display: flex; gap: 14px; align-items: flex-start; }
+  .scene + .scene { margin-top: 14px; }
+  .scene .icon {
+    flex: none; width: 46px; height: 46px; border-radius: 14px;
+    background: var(--accent-soft); display: grid; place-items: center; font-size: 1.4rem;
+  }
+  .scene .time { color: var(--accent); font-weight: 700; font-size: .82rem; }
+
+  /* ステップ */
+  ol.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
+  ol.steps > li { position: relative; padding-left: 40px; counter-increment: s; }
+  ol.steps > li + li { margin-top: 16px; }
+  ol.steps > li::before {
+    content: counter(s);
+    position: absolute; left: 0; top: 0;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center; font-weight: 700; font-size: .85rem;
+  }
+  ol.steps .sub { margin: 2px 0 0; }
+
+  /* 画面の見本 */
+  .mock {
+    border: 1px solid var(--line); border-radius: 14px; background: var(--bg);
+    padding: 10px; margin-top: 8px; font-size: .85rem;
+  }
+  .mock .mbtn {
+    display: inline-block; background: var(--accent); color: #fff; font-weight: 700;
+    padding: 6px 12px; border-radius: 10px; font-size: .82rem;
+  }
+  .mock .mbtn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+  .mock .subjects { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .mock .subjects span {
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 10px;
+    text-align: center; padding: 6px; font-weight: 700;
+  }
+  .mock .subjects span.hi { border-color: var(--accent); color: var(--accent); }
+
+  /* チャット */
+  .chat { display: grid; gap: 8px; }
+  .bubble { padding: 10px 12px; border-radius: 14px; font-size: .88rem; max-width: 90%; }
+  .bubble.me { background: var(--accent); color: #fff; justify-self: end; border-bottom-right-radius: 4px; }
+  .bubble.ai { background: var(--chat-ai); justify-self: start; border-bottom-left-radius: 4px; }
+
+  /* 合言葉 */
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: 8px 4px; text-align: left; vertical-align: top; }
+  th { color: var(--sub); font-weight: 600; font-size: .82rem; }
+  td.word { font-weight: 700; white-space: nowrap; color: var(--accent); }
+
+  .point {
+    border-left: 4px solid var(--accent); background: var(--accent-soft);
+    padding: 10px 12px; border-radius: 8px; font-size: .92rem; margin-top: 10px;
+  }
+  .point.warm { border-color: var(--warm); background: var(--warm-soft); }
+
+  /* Q&A */
+  details.qa { background: var(--card); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 8px; }
+  details.qa summary {
+    padding: 14px 16px; font-weight: 700; cursor: pointer; list-style: none;
+    display: flex; justify-content: space-between; gap: 8px;
+  }
+  details.qa summary::-webkit-details-marker { display: none; }
+  details.qa summary::after { content: "＋"; color: var(--accent); flex: none; }
+  details.qa[open] summary::after { content: "－"; }
+  details.qa .ans { padding: 0 16px 14px; font-size: .92rem; }
+  details.qa .ans p:last-child { margin-bottom: 0; }
+
+  .rules li { margin-bottom: 8px; }
+  footer { margin-top: 40px; text-align: center; color: var(--sub); font-size: .85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="tag">使い方ガイド</span>
+  <h1>予習サクッと の使い方</h1>
+  <p>AIに調べものを任せて、予習を<b>1日30分</b>にするアプリです。<br>5分で読めます。わからなくなったら、いつでもここに戻ってきてね。</p>
+  <a class="btn" href="./">アプリを開く</a>
+
+  <nav class="toc" aria-label="もくじ">
+    <a href="#junbi">① 最初の準備</a>
+    <a href="#yoshu">② 毎日の予習</a>
+    <a href="#aikotoba">③ AIへの合言葉</a>
+    <a href="#quiz">④ クイズとまとめ</a>
+    <a href="#kiroku">⑤ 記録と報告</a>
+    <a href="#komatta">⑥ 困ったとき</a>
+    <a href="#rule">⑦ ルール</a>
+  </nav>
+
+  <div class="card" style="margin-top:20px">
+    <h3>使う場面は3つだけ</h3>
+    <div class="scene" style="margin-top:10px">
+      <div class="icon">🏠</div>
+      <div><div class="time">家で・1教科10分</div>教科書を撮って、AIに下調べしてもらう</div>
+    </div>
+    <div class="scene">
+      <div class="icon">🚃</div>
+      <div><div class="time">電車で・5分</div>単語クイズで覚える</div>
+    </div>
+    <div class="scene">
+      <div class="icon">⏰</div>
+      <div><div class="time">授業前・5分</div>まとめを見返す</div>
+    </div>
+  </div>
+
+  <!-- ① 準備 -->
+  <h2 id="junbi"><span class="num">1</span>最初の準備（1回だけ）</h2>
+  <div class="card">
+    <ol class="steps">
+      <li>
+        <h3>おうちの人にOKをもらう</h3>
+        <p class="sub">「勉強にAI（ChatGPT）を使いたい」と伝えよう。18歳未満は保護者のOKが必要です。</p>
+      </li>
+      <li>
+        <h3>ChatGPT を入れる</h3>
+        <p class="sub">App Store で「ChatGPT」と検索。作っている会社が <b>OpenAI</b> になっているものを入れる（似た名前のニセモノに注意）。Apple か Google のアカウントでログイン。有料プランは選ばなくてOK。</p>
+      </li>
+      <li>
+        <h3>このアプリをホーム画面に置く</h3>
+        <p class="sub">Safari でアプリを開く →下の「共有」ボタン（□に↑のマーク）→「ホーム画面に追加」→「追加」。</p>
+        <div class="point" style="margin-top:8px">置いたあとは、<b>いつもホーム画面のアイコンから開く</b>こと。Safariから開くのとは記録が別々になっちゃうよ。ホーム画面から開くと、記録も消えにくくなる。</div>
+      </li>
+      <li>
+        <h3>（Gemini を使う人だけ）AIを切りかえる</h3>
+        <p class="sub">アプリの「📊記録」→「使うAI」で Gemini を選ぶ。ChatGPT の人は何もしなくてOK。</p>
+      </li>
+    </ol>
+  </div>
+
+  <!-- ② 予習 -->
+  <h2 id="yoshu"><span class="num">2</span>毎日の予習（1教科10分）</h2>
+  <div class="card">
+    <ol class="steps">
+      <li>
+        <h3>「📷予習」で教科を押す</h3>
+        <p class="sub">押した瞬間にタイマーがスタート。</p>
+        <div class="mock">
+          <div class="subjects"><span class="hi">英語</span><span>数学</span><span>現代文</span><span>古文・漢文</span></div>
+        </div>
+      </li>
+      <li>
+        <h3>「コピーして ChatGPT を開く」を押す</h3>
+        <p class="sub">AIへのお願い文が自動でコピーされて、ChatGPTが開くよ。</p>
+        <div class="mock"><span class="mbtn">コピーして ChatGPT を開く</span></div>
+      </li>
+      <li>
+        <h3>教科書を撮って、お願い文を貼って送る</h3>
+        <p class="sub">ChatGPTで「＋」→「カメラ」→ 明日やる教科書のページを撮る → 入力欄を長押し →「ペースト」→ 送信。</p>
+      </li>
+      <li>
+        <h3>ヒントを見て、自分で考える</h3>
+        <p class="sub">AIは最初、答えではなく<b>ヒント</b>を出すよ。自分で考えてから「答え合わせ」と送ろう（合言葉は次の③で）。</p>
+        <div class="mock chat">
+          <div class="bubble ai"><b>1文目のヒント</b><br>主語は "Many students"。動詞を探してみよう。</div>
+          <div class="bubble me">答え合わせ</div>
+        </div>
+      </li>
+      <li>
+        <h3>AIの返事をアプリに貼る</h3>
+        <p class="sub">AIの返事の最後に【まとめ】と【カード】が出てくる。返事を長押し →「コピー」→ アプリに戻って貼りつけ →「カードとまとめを保存」。</p>
+        <div class="mock"><span class="mbtn ghost">カードとまとめを保存</span>
+          <div style="margin-top:6px;color:var(--accent);font-weight:700">保存したよ！ 新しいカード 8枚／まとめ 1件</div>
+        </div>
+      </li>
+      <li>
+        <h3>「記録する」を押して終わり</h3>
+        <p class="sub">かかった時間は自動で入る。ずれていたら直してから押してね。</p>
+      </li>
+    </ol>
+    <div class="point">ChatGPTに行ってもどってきても、アプリは予習中の画面のまま待ってくれているよ。</div>
+  </div>
+
+  <!-- ③ 合言葉 -->
+  <h2 id="aikotoba"><span class="num">3</span>AIへの合言葉</h2>
+  <div class="card">
+    <p class="sub">お願い文にルールが書いてあるので、これを送るだけでAIが動いてくれるよ。</p>
+    <table>
+      <tr><th>送る言葉</th><th>こうなる</th></tr>
+      <tr><td class="word">次</td><td>次のヒントが出る（数学で使う）</td></tr>
+      <tr><td class="word">答え合わせ</td><td>全文の訳・解き方・質問の答えが出る</td></tr>
+      <tr><td class="word">降参</td><td>最初からていねいに説明してくれる（「問題がわからない」のとき）</td></tr>
+    </table>
+    <div class="point warm"><b>先に自分で考えてから「答え合わせ」</b>。いきなり答えを見ると、授業で当てられたときに困るのは自分だよ。</div>
+  </div>
+
+  <div class="card">
+    <h3>予習以外のお願い文</h3>
+    <p class="sub">「📷予習」の下の「こんなときは」から使えるよ。</p>
+    <table>
+      <tr><td class="word">問題がわからない</td><td>答えは教えず、ヒントを1つずつ出してもらう</td></tr>
+      <tr><td class="word">先生役モード</td><td>週末に、習ったことをAIに説明する。まちがいを見つけてもらえる。人に説明すると一番覚えるよ</td></tr>
+      <tr><td class="word">中学の内容</td><td>あやふやな中学の内容を3行で教えてもらって、確認問題を解く</td></tr>
+    </table>
+  </div>
+
+  <!-- ④ クイズとまとめ -->
+  <h2 id="quiz"><span class="num">4</span>クイズとまとめ</h2>
+  <div class="card">
+    <span class="tag">🃏 クイズ・電車で5分</span>
+    <ol class="steps" style="margin-top:12px">
+      <li><h3>教科を選んで「10問スタート」</h3></li>
+      <li><h3>頭の中で答えてから「答えを見る」</h3></li>
+      <li>
+        <h3>「覚えた ○」か「まだ ×」を押す</h3>
+        <p class="sub">×のカードは次回また出る。正直に押すほど早く覚えられるよ。</p>
+      </li>
+    </ol>
+  </div>
+  <div class="card">
+    <span class="tag">📝 まとめ・授業前に5分</span>
+    <p style="margin-top:10px">その日の予習のポイントが3つずつ並んでいるよ。授業の前にさっと見るだけで、当てられても落ち着いて答えられる。</p>
+  </div>
+
+  <!-- ⑤ 記録 -->
+  <h2 id="kiroku"><span class="num">5</span>記録と報告</h2>
+  <div class="card">
+    <p>「📊記録」では、<b>連続で予習した日数</b>と<b>毎日の予習時間のグラフ</b>が見られるよ。点線が目標の30分。</p>
+    <p style="margin:0">週に1回、「<b>LINEで報告する</b>」を押して、相談している人に送ってね。うまくいかないところがあれば、アプリを直していくよ。</p>
+  </div>
+
+  <!-- ⑥ 困ったとき -->
+  <h2 id="komatta"><span class="num">6</span>困ったとき</h2>
+  <details class="qa">
+    <summary>貼ったのに「カードとまとめが見つからなかった」と出る</summary>
+    <div class="ans">
+      <p>AIが決まった形で答えなかったのが原因。ChatGPTに<br><b>「【まとめ】と【カード】の形で出して」</b><br>と送ってから、その返事をもう一度貼ってね。</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>ChatGPTに貼りつけても何も出てこない</summary>
+    <div class="ans">
+      <p>コピーがうまくいかなかったのかも。アプリの「お願い文を見る」を開いて、文を長押しして自分でコピーしてね。</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>ChatGPTのアプリじゃなくて、Safariが開く</summary>
+    <div class="ans">
+      <p>そのままSafariでログインして使ってもOK。アプリで使いたいときは、コピーしたあと自分でChatGPTのアプリを開いて貼ればOK。</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>「今日はこれ以上使えません」みたいに出た</summary>
+    <div class="ans">
+      <p>無料版は、1日に使える回数に上限があるよ。時間をおくとまた使える。急ぐときは Gemini（無料）に切りかえてもOK（「📊記録」→「使うAI」）。</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>予習の途中でやめたい</summary>
+    <div class="ans">
+      <p>予習中の画面のいちばん下にある「やめる（記録しない）」を押してね。途中までやったなら、「記録する」で残してもOK。</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>記録が消えた／機種変更したい</summary>
+    <div class="ans">
+      <p>記録はこのスマホの中だけに保存されているよ。Safariの履歴やデータを消すと、一緒に消えることがある。</p>
+      <p>機種変更の前は「📊記録」→「書き出し」でファイルを保存して、新しいスマホで「読み込み」してね。</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>おかしなカードが入った／まとめを消したい</summary>
+    <div class="ans">
+      <p>カードは「🃏クイズ」→「カードの一覧を見る」→「消す」。まとめは「📝まとめ」の各まとめの「消す」で消せるよ。</p>
+    </div>
+  </details>
+
+  <!-- ⑦ ルール -->
+  <h2 id="rule"><span class="num">7</span>守ってほしい3つのルール</h2>
+  <div class="card">
+    <ol class="rules" style="margin:0;padding-left:1.3em">
+      <li><b>答えを丸写ししない。</b>まずヒント、答え合わせは最後。</li>
+      <li><b>AIもまちがえる。</b>おかしいと思ったら教科書や先生を信じる。</li>
+      <li><b>個人情報は送らない。</b>名前・住所・学校名・顔が写った写真などはAIに送らない。</li>
+    </ol>
+  </div>
+
+  <a class="btn" href="./" style="margin-top:28px">アプリを開く</a>
+  <footer>がんばりすぎず、サクッといこう。</footer>
+</div>
+</body>
+</html>
