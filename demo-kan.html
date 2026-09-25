@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2f6f5e">
+<title>予習サクッと 使ってみた例（漢文）</title>
+<meta name="description" content="漢文の教科書1ページを、予習サクッととChatGPTで予習してみた実例">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="demo/demo.css?v=3">
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="subj-nav" aria-label="教科">
+    <a href="demo.html">英語</a>
+    <a href="demo-ma.html">数学</a>
+    <a href="demo-ge.html">現代文</a>
+    <a href="demo-ko.html">古文</a>
+    <a href="demo-kan.html" class="on">漢文</a>
+  </nav>
+  <span class="tag">使ってみた例</span>
+  <h1>漢文の予習を、<br>実際にやってみた</h1>
+  <p>教科書の1ページを「予習サクッと」とChatGPTで予習すると、どうなるかを順番に見せるよ。<br>アプリの画面は、<b>本物のアプリを実際に動かして撮ったもの</b>です。</p>
+  <div class="flow">
+    <span>🏠 <b>家で</b> 約10分</span>
+    <span>🚃 <b>電車で</b> 5分</span>
+    <span>⏰ <b>授業前</b> 5分</span>
+  </div>
+
+  <!-- 教科書 -->
+  <h2 style="margin-top:32px">今回予習する教科書のページ</h2>
+  <div class="textbook tate">
+    <div class="tate-body kanbun" tabindex="0" aria-label="縦書きの本文（返り点つき）">
+      <h3>矛盾</h3>
+      <div class="by">『韓非子』</div>
+      <p>楚人有<span class="kt">下</span>鬻<span class="kt">二</span>盾与<span class="kt">一レ</span>矛者<span class="kt">上</span>。誉<span class="kt">レ</span>之曰、「吾盾之堅、莫<span class="kt">二</span>能陥<span class="kt">一</span>也。」又誉<span class="kt">二</span>其矛<span class="kt">一</span>曰、「吾矛之利、於<span class="kt">レ</span>物無<span class="kt">レ</span>不<span class="kt">レ</span>陥也。」或曰、「以<span class="kt">二</span>子之矛<span class="kt">一</span>、陥<span class="kt">二</span>子之盾<span class="kt">一</span>、何如。」其人弗<span class="kt">レ</span>能<span class="kt">レ</span>応也。</p>
+    </div>
+    <div class="scroll-hint">小さい字（レ・一・二・上・下）が返り点。送りがなは省いています</div>
+    <div class="note">※『韓非子』「難一」より。昔の作品なので、本文をそのまま載せています</div>
+  </div>
+
+  <!-- ===== 家で ===== -->
+  <div class="scene-head"><span class="icon">🏠</span><div><b>家で予習する</b><span>1教科 約10分</span></div></div>
+
+  <div class="step" data-no="1">
+    <div class="where app">予習サクッと</div>
+    <h2>「古文・漢文」を押す</h2>
+    <p class="sub" style="margin:0">漢文も「古文・漢文」のボタン。押すとタイマーが動いて、やることが順番に出てくる。</p>
+    <div class="shots">
+      <figure><div class="phone"><a href="demo/01-home.jpg"><img src="demo/01-home.jpg" alt="予習サクッとのはじめの画面。英語・数学・現代文・古文漢文のボタンが並んでいる" width="600" height="1200" loading="lazy"></a></div><figcaption>①「古文・漢文」を押す</figcaption></figure>
+      <figure><div class="phone"><a href="demo/kan-02-steps.jpg"><img src="demo/kan-02-steps.jpg" alt="古文・漢文を押したあとの画面。タイマーと、やることの手順が表示されている" width="600" height="1200" loading="lazy"></a></div><figcaption>② 手順が出る</figcaption></figure>
+    </div>
+    <div class="swipe">← 横にスワイプできるよ／画像を押すと大きく見られるよ</div>
+  </div>
+
+  <div class="step" data-no="2">
+    <div class="where chat">ChatGPT</div>
+    <h2>「予習」で、教科書の写真を送る</h2>
+    <p class="sub" style="margin:0">「予習」の中で新しいチャット →<b>「漢文」</b>と打つ →「＋」→「カメラ」で本文のページを撮る → 送信。</p>
+    <div class="gpt">
+      <div class="bar">予習 <small>›　新しいチャット</small></div>
+      <div class="body">
+        <div class="user"><span class="photo-thumb tate"><span>📷 教科書の写真</span></span>漢文</div>
+      </div>
+    </div>
+    <div class="caption-img">ChatGPTの画面のイメージ</div>
+    <div class="point">返り点や送りがなまで読み取れるように、<b>ページをまっすぐ、明るいところで撮る</b>のがコツ。</div>
+  </div>
+
+  <div class="step" data-no="3">
+    <div class="where chat">ChatGPT</div>
+    <h2>ヒントが返ってくる</h2>
+    <p class="sub" style="margin:0">大事な漢字と句法、それに<b>1文ずつの書き下し・訳のヒント</b>。全文の訳はまだ出ない。</p>
+    <div class="gpt">
+      <div class="body">
+        <div class="ai">
+          <h4>■ 大事な漢字・句法</h4>
+          <ul>
+            <li>鬻ぐ（ひさぐ）：売る</li>
+            <li>莫し（なし）：〜するものはない</li>
+            <li>何如（いかん）：どうであるか</li>
+          </ul>
+          <div class="more">（6個まで続く）</div>
+          <h4>■ 大事な文法：二重否定</h4>
+          <p style="margin:0">「無不〜」は「〜ざるは無し」と読んで、「〜しないものはない」＝「すべて〜する」という強い言い方。<br><span class="hint">本文の中から「無不〜」を探して、どんな意味になるか考えてみよう。</span></p>
+          <h4>■ 1文ずつ書き下し・訳のヒント</h4>
+          <ol>
+            <li>楚人有鬻盾与矛者。<br><span class="hint">→ 返り点の順番に注意。「有」は最後に読むよ。「〜する者有り」の形。</span></li>
+            <li>誉之曰、「吾盾之堅、莫能陥也。」<br><span class="hint">→「之」は盾のこと。「莫能陥」は「能く陥すもの莫し」＝突き通せるものはない。</span></li>
+            <li>又誉其矛曰、「吾矛之利、於物無不陥也。」<br><span class="hint">→ ここが二重否定！「利」は「するどい」の意味。</span></li>
+          </ol>
+          <div class="fmt">
+            <b>【まとめ】</b><br>
+            ・盾と矛を売る楚の人が、つじつまの合わないことを言ってしまった話<br>
+            ・「無不〜（〜ざるは無し）」は二重否定＝「すべて〜する」という強い肯定<br>
+            ・「矛盾」という言葉は、この話から生まれた<br>
+            <b>【カード】</b><br>
+            鬻ぐ（ひさぐ）｜売る<br>
+            誉む（ほむ）｜ほめる<br>
+            <span class="more">（10個まで続く）</span>
+          </div>
+          <div class="tools" aria-label="返事の下のボタン">
+            <span class="copy" aria-label="コピー"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption-img">ChatGPTの返事の例（実際の返事は毎回少しずつちがうよ）</div>
+    <div class="point">最後の<b>【まとめ】【カード】</b>が、アプリに保存される部分。</div>
+  </div>
+
+  <div class="step" data-no="4">
+    <div class="where chat">ChatGPT</div>
+    <h2>自分で書き下してから「答え合わせ」</h2>
+    <div class="gpt">
+      <div class="body">
+        <div class="user">答え合わせ</div>
+        <div class="ai">
+          <h4>■ 書き下し文</h4>
+          <p style="margin:0">楚人に盾と矛とを鬻ぐ者有り。之を誉めて曰はく、「吾が盾の堅きこと、能く陥すもの莫きなり。」と。…</p>
+          <h4>■ 現代語訳</h4>
+          <p style="margin:0">楚の国の人で、盾と矛を売る者がいた。盾をほめて言うには、「私の盾の堅いことといったら、突き通せるものはない。」と。また矛をほめて言うには、「私の矛の鋭いことといったら、どんな物でも突き通さないものはない。」と。…</p>
+        </div>
+      </div>
+    </div>
+    <div class="caption-img">ChatGPTの返事の例</div>
+    <div class="point warm">漢文の予習は<b>書き下し文を自分で書く</b>のが基本。先に書いてから見比べて、ちがったところだけ直せばOK。</div>
+  </div>
+
+  <div class="step" data-no="5">
+    <div class="where app">予習サクッと</div>
+    <h2>最初の返事をアプリに貼って保存</h2>
+    <p class="sub" style="margin:0">ステップ3の返事の<b>コピーボタン</b>を押す → アプリに戻って貼る →「カードとまとめを保存」→ 最後に「記録する」。</p>
+    <div class="shots">
+      <figure><div class="phone"><a href="demo/kan-03-paste.jpg"><img src="demo/kan-03-paste.jpg" alt="ChatGPTの返事を貼りつけた画面" width="600" height="1200" loading="lazy"></a></div><figcaption>① 貼りつけて「保存」</figcaption></figure>
+      <figure><div class="phone"><a href="demo/kan-04-saved.jpg"><img src="demo/kan-04-saved.jpg" alt="新しいカード10枚、まとめ1件を保存したと表示されている" width="600" height="1200" loading="lazy"></a></div><figcaption>② カード10枚とまとめが保存された</figcaption></figure>
+    </div>
+    <div class="swipe">← 横にスワイプできるよ／画像を押すと大きく見られるよ</div>
+  </div>
+
+  <div class="total">この教科書1ページの予習にかかった時間<br><b>約10分</b><br><span class="sub">漢和辞典を引く時間が、ほぼゼロになるよ</span></div>
+
+  <!-- ===== 電車で ===== -->
+  <div class="scene-head"><span class="icon">🚃</span><div><b>電車でクイズ</b><span>5分</span></div></div>
+  <div class="step" data-no="6">
+    <div class="where app">予習サクッと ›「🃏クイズ」</div>
+    <h2>漢字の読みと句法をクイズで覚える</h2>
+    <p class="sub" style="margin:0">頭の中で答えてから「答えを見る」→「覚えた ○」か「まだ ×」。句法はテストにもよく出るよ。</p>
+    <div class="shots">
+      <figure><div class="phone"><a href="demo/kan-07-quiz-q.jpg"><img src="demo/kan-07-quiz-q.jpg" alt="クイズの問題。鬻ぐ（ひさぐ） と表示されている" width="600" height="1200" loading="lazy"></a></div><figcaption>① 意味を思い出す</figcaption></figure>
+      <figure><div class="phone"><a href="demo/kan-08-quiz-a.jpg"><img src="demo/kan-08-quiz-a.jpg" alt="クイズの答え。売る と表示されている" width="600" height="1200" loading="lazy"></a></div><figcaption>② 答えを見て○か×</figcaption></figure>
+    </div>
+    <div class="swipe">← 横にスワイプできるよ</div>
+  </div>
+
+  <!-- ===== 授業前 ===== -->
+  <div class="scene-head"><span class="icon">⏰</span><div><b>授業の前にまとめ</b><span>5分</span></div></div>
+  <div class="step" data-no="7">
+    <div class="where app">予習サクッと ›「📝まとめ」</div>
+    <h2>ポイント3つを見返す</h2>
+    <p class="sub" style="margin:0">話のあらすじと句法が3行でわかる。当てられても落ち着いて答えられるよ。</p>
+    <div class="shots one">
+      <figure><div class="phone"><a href="demo/kan-09-notes.jpg"><img src="demo/kan-09-notes.jpg" alt="授業前のまとめ画面。漢文のポイントが3つ並んでいる" width="600" height="1200" loading="lazy"></a></div><figcaption>予習のポイントが3つ</figcaption></figure>
+    </div>
+  </div>
+
+  <div style="display:grid;gap:10px;margin-top:32px">
+    <a class="btn ghost" href="demo.html">英語の例にもどる</a>
+    <a class="btn" href="./">アプリを開く</a>
+    <a class="btn ghost" href="guide.html">使い方ガイド（最初の準備はこちら）</a>
+  </div>
+  <footer>まずは次の漢文の授業で、1回だけ試してみよう。</footer>
+</div>
+</body>
+</html>

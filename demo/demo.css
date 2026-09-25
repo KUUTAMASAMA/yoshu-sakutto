@@ -232,6 +232,10 @@ footer { margin-top: 40px; text-align: center; color: var(--sub); font-size: .85
 .tate-body p { margin: 0; text-indent: 1em; font-size: 1rem; line-height: 1.95; }
 .scroll-hint { font-family: -apple-system, "Hiragino Sans", "Yu Gothic UI", sans-serif; font-size: .75rem; color: var(--sub); margin-top: 6px; }
 
+/* 漢文（返り点は小さく、字の下に入れる） */
+.tate-body.kanbun p { font-size: 1.2rem; letter-spacing: .1em; line-height: 2.3; text-indent: 0; }
+.kt { font-size: .5em; letter-spacing: 0; color: var(--warm); font-weight: 700; }
+
 /* ChatGPTに送る写真（イメージ） */
 .photo-thumb {
   display: block; width: 128px; height: 92px; border-radius: 10px; margin: 2px 0 6px auto;
