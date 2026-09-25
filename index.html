@@ -143,6 +143,12 @@
   .extra { border-top: 1px solid var(--line); padding: 12px 0; }
   .extra:first-of-type { border-top: none; padding-top: 0; }
   .extra h3 { font-size: .95rem; margin: 0 0 2px; }
+  .setup { background: var(--accent-soft); border-color: var(--accent); }
+  .setup h2 { color: var(--accent); }
+  .howto { margin: 4px 0 0; padding-left: 1.2em; font-size: .88rem; color: var(--sub); }
+  .howto li { margin-bottom: 4px; }
+  .howto b { color: var(--text); }
+  #a-steps + .step { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--line); }
 
   /* チップ */
   .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
@@ -241,6 +247,12 @@
         <h1>予習サクッと</h1>
         <a href="guide.html">使い方 →</a>
       </div>
+      <div class="card setup" id="setup-banner" hidden>
+        <h2>はじめに：ChatGPTの準備（1回だけ）</h2>
+        <p class="sub">ChatGPTに「予習のルール」を覚えさせておくと、毎回お願い文を貼らなくてよくなるよ。3分で終わる。</p>
+        <a class="btn" href="guide.html#junbi">やり方を見る</a>
+        <button class="btn plain" id="setup-done" style="margin-top:8px">もう準備できた</button>
+      </div>
       <div class="tiles">
         <div class="tile"><b id="t-streak">0</b><span>連続日数</span></div>
         <div class="tile"><b id="t-today">0</b><span>今日の予習（分）</span></div>
@@ -280,36 +292,12 @@
       </div>
 
       <div class="card">
+        <div id="a-steps"></div>
         <div class="step">
-          <div class="no">1</div>
+          <div class="no" id="a-paste-no">5</div>
           <div class="body">
-            <h3>お願い文をコピーしてAIを開く</h3>
-            <a class="btn" id="a-open" href="https://chatgpt.com/" target="_blank" rel="noopener">コピーして <span class="ai-name">ChatGPT</span> を開く</a>
-            <details>
-              <summary>お願い文を見る</summary>
-              <pre class="prompt" id="a-prompt"></pre>
-            </details>
-          </div>
-        </div>
-        <div class="step">
-          <div class="no">2</div>
-          <div class="body">
-            <h3>教科書を撮って送る</h3>
-            <p class="sub" style="margin:0"><span class="ai-name">ChatGPT</span> で「＋」→ カメラで教科書のページを撮る → 入力欄を長押しして「ペースト」→ 送信</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="no">3</div>
-          <div class="body">
-            <h3>ヒントを見て自分で考える</h3>
-            <p class="sub" style="margin:0" id="a-tip"></p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="no">4</div>
-          <div class="body">
-            <h3>AIの返事をここに貼る</h3>
-            <p class="sub">AIの返事を長押し →「コピー」→ 下に貼りつけ。単語カードとまとめが自動で保存されるよ。</p>
+            <h3>ChatGPTの最初の返事をここに貼る</h3>
+            <p class="sub">返事の下にある<b>コピーボタン</b>（四角が2つ重なったマーク）を押す → 下に貼りつけ。単語カードとまとめが自動で保存されるよ。</p>
             <textarea id="a-paste" placeholder="ここに貼りつけ"></textarea>
             <button class="btn ghost" id="a-save" style="margin-top:8px">カードとまとめを保存</button>
             <div id="a-saved" hidden></div>
@@ -397,12 +385,14 @@
       <button class="btn line" id="report">LINEで報告する</button>
     </div>
     <div class="card">
-      <h2>使うAI</h2>
-      <div class="seg" id="ai-seg">
-        <button data-ai="chatgpt">ChatGPT</button>
-        <button data-ai="gemini">Gemini</button>
-      </div>
-      <p class="sub" style="margin:10px 0 0">「コピーして開く」を押したときに開くAIです。</p>
+      <h2>ChatGPTの準備</h2>
+      <p class="sub">ChatGPTのプロジェクト「予習」の「指示」に、このルールを貼っておくと、毎回のお願い文がいらなくなるよ。</p>
+      <button class="btn ghost" id="copy-rules">予習のルールをコピー</button>
+      <details>
+        <summary>ルールの中身を見る</summary>
+        <pre class="prompt" id="rules-text"></pre>
+      </details>
+      <p class="sub" style="margin:10px 0 0">くわしいやり方は <a href="guide.html#junbi" style="color:var(--accent)">使い方ガイド</a> へ。</p>
     </div>
     <div class="card">
       <h2>ホーム画面に置く</h2>
@@ -434,16 +424,39 @@
 <script>
 // ================= 設定 =================
 const SUBJECTS = [
-  { k: "en", name: "英語", note: "単語・和訳", card: "英単語・熟語｜意味" },
-  { k: "ma", name: "数学", note: "例題・公式", card: "公式・用語｜意味や使い方" },
-  { k: "ge", name: "現代文", note: "言葉・読解", card: "言葉｜意味" },
-  { k: "ko", name: "古文・漢文", note: "古語・訳", card: "古語・句法｜意味" },
+  { k: "en", name: "英語", say: "英語", note: "単語・和訳", card: "英単語・熟語｜意味" },
+  { k: "ma", name: "数学", say: "数学", note: "例題・公式", card: "公式・用語｜意味や使い方" },
+  { k: "ge", name: "現代文", say: "現代文", note: "言葉・読解", card: "言葉｜意味" },
+  { k: "ko", name: "古文・漢文", say: "古文」か「漢文", note: "古語・訳", card: "古語・句法｜意味" },
 ];
-const AI = {
-  chatgpt: { name: "ChatGPT", url: "https://chatgpt.com/" },
-  gemini: { name: "Gemini", url: "https://gemini.google.com/app" },
-};
+const GPT_URL = "https://chatgpt.com/";
 const GOAL = 30;
+
+// ChatGPTのプロジェクト「予習」の「指示」に貼るルール（guide.html にも同じ文があるので、変えるときは両方直す）
+const RULES = `あなたは高校1年生の予習を手伝う先生です。このプロジェクトのチャットでは、次のルールを守ってください。
+
+■教科
+最初のメッセージに書いてある教科（英語・数学・現代文・古文・漢文）の先生として答えてください。書いていなければ、写真や文章から判断してください。
+
+■いつものルール
+・答えや全文の訳を、いきなり出さない。まずヒントを出す。
+・中学生にもわかる言葉で、短く説明する。
+・私が「次」と送ったら、次のヒントを出す。
+・私が「答え合わせ」と送ったら、全文の訳・解き方・質問の答えを出す。
+・私が「降参」と送ったら、最初からていねいに説明する。
+
+■教科ごとにやること
+英語：1文ずつ意味をつかむヒント／大事な文法を1つ／授業で聞かれそうな質問を3つ（答えはまだ出さない）
+数学：このページで習うことを3行で説明／例題の解き方のヒントを1段ずつ／必要な中学の内容を1つ
+現代文：むずかしい言葉の説明／筆者の言いたいことを見つけるヒント／授業で聞かれそうな質問を3つ（答えはまだ出さない）
+古文・漢文：大事な古語や句法の意味／大事な文法を1つ／1文ずつ現代語訳のヒント
+
+■最初の返事の最後に、アプリに保存するため、必ず次の形をつける（予習以外のお願いのときは、つけなくてよい）
+【まとめ】
+・授業の前に見返すポイントを3つ（1行に1つ）
+【カード】
+覚えること｜意味
+（1行に1つ、10個まで。表にしないで「｜」で区切る）`;
 const STORE_KEY = "yoshu-sakutto-v1";
 
 const TAIL = (s) => `
@@ -456,7 +469,7 @@ ${s.card}
 
 const PROMPTS = {
   en: s => `あなたは高校1年生向けの英語の先生です。
-写真は、明日の授業で習う教科書のページです。予習を手伝ってください。
+送った写真や文章は、明日の授業で習う教科書のページです。予習を手伝ってください。
 
 1. 1文ずつ、意味をつかむためのヒントを出してください。まだ全文の訳は出さないでください。
 2. 大事な文法を1つだけ、かんたんに説明してください。
@@ -465,7 +478,7 @@ const PROMPTS = {
 私が「答え合わせ」と送ったら、全文の訳と質問の答えを出してください。
 ${TAIL(s)}`,
   ma: s => `あなたは高校1年生向けの数学の先生です。
-写真は、明日の授業で習う教科書のページです。予習を手伝ってください。
+送った写真や文章は、明日の授業で習う教科書のページです。予習を手伝ってください。
 
 1. このページで習うことを、中学生にもわかる言葉で3行で説明してください。
 2. 例題の解き方を、ヒントとして1段ずつ出してください。一気に答えを出さないでください。
@@ -474,7 +487,7 @@ ${TAIL(s)}`,
 私が「次」と送ったら次のヒントを、「答え合わせ」と送ったら解き方の全体を出してください。
 ${TAIL(s)}`,
   ge: s => `あなたは高校1年生向けの国語（現代文）の先生です。
-写真は、明日の授業で読む文章です。予習を手伝ってください。
+送った写真や文章は、明日の授業で読む文章です。予習を手伝ってください。
 
 1. 読み方や意味がむずかしい言葉を選んで、かんたんに説明してください。
 2. 筆者がいちばん言いたいことを見つけるためのヒントを出してください（答えはまだ出さない）。
@@ -483,7 +496,7 @@ ${TAIL(s)}`,
 私が「答え合わせ」と送ったら、段落ごとの要約と質問の答えを出してください。
 ${TAIL(s)}`,
   ko: s => `あなたは高校1年生向けの古文・漢文の先生です。
-写真は、明日の授業で読む教科書のページです。予習を手伝ってください。
+送った写真や文章は、明日の授業で読む教科書のページです。予習を手伝ってください。
 
 1. 大事な古語（漢文なら大事な漢字や句法）を選んで、意味を説明してください。
 2. 大事な文法（助動詞や返り点など）を1つだけ、かんたんに説明してください。
@@ -513,7 +526,7 @@ const EXTRAS = {
 
 // ================= データ =================
 function blank() {
-  return { ai: "chatgpt", sessions: [], cards: [], notes: [], active: null };
+  return { setupDone: false, sessions: [], cards: [], notes: [], active: null };
 }
 function load() {
   try {
@@ -567,7 +580,6 @@ function copyText(text) {
   }
   return ok;
 }
-function currentAI() { return AI[state.ai] || AI.chatgpt; }
 
 // ================= 集計 =================
 function minutesOn(dateStr) {
@@ -617,23 +629,57 @@ function parseReply(raw, subjectKey) {
 }
 
 // ================= 予習タブ =================
+// 教科ごとの手順（英語は写真の回数を節約するため、カメラの文字読み取りでコピーする）
+function stepsFor(s) {
+  const open = {
+    t: "ChatGPTを開いて、プロジェクト「予習」で新しいチャット",
+    html: `<a class="btn" href="${GPT_URL}" target="_blank" rel="noopener">ChatGPT を開く</a>
+      <p class="sub" style="margin:8px 0 0">左上のメニュー → プロジェクト「予習」→ 新しいチャット</p>`,
+  };
+  const fallback = `<details><summary>プロジェクトを作っていないときは</summary>
+      <p class="sub" style="margin:8px 0 0">教科名の代わりに、このお願い文を貼って送ってね。</p>
+      <pre class="prompt">${esc(PROMPTS[s.k](s))}</pre>
+      <button class="btn small ghost copy-prompt" style="margin-top:8px">お願い文をコピー</button></details>`;
+  const hint = { t: "ヒントを見て、自分で考える", html: `<p class="sub" style="margin:0">${TIPS[s.k]}</p>` };
+  if (s.k === "en") return [
+    {
+      t: "教科書の英文をコピーする",
+      html: `<ol class="howto">
+        <li>iPhoneの<b>カメラ</b>を教科書の英文に向ける</li>
+        <li>右下の<b>文字読み取りマーク</b>（枠の中に線）を押す</li>
+        <li><b>「すべてを選択」→「コピー」</b></li></ol>
+        <p class="sub" style="margin:6px 0 0">写真を送る回数（1日数回まで）を節約できるよ。うまくいかなければ写真でもOK。</p>`,
+    },
+    open,
+    { t: "「英語」と打って、貼りつけて送る", html: `<p class="sub" style="margin:0">入力欄に「英語」と打って改行 → 長押しして「ペースト」→ 送信</p>${fallback}` },
+    hint,
+  ];
+  return [
+    open,
+    { t: `「${s.say}」と打って、教科書を撮って送る`, html: `<p class="sub" style="margin:0">入力欄に「${s.say}」と打つ →「＋」→「カメラ」で明日やるページを撮る → 送信</p>${fallback}` },
+    hint,
+  ];
+}
+
 function renderHome() {
   $("t-streak").textContent = streak();
   $("t-today").textContent = minutesOn(ymd(new Date()));
   $("t-cards").textContent = knownCount();
+  $("setup-banner").hidden = !!state.setupDone;
   $("subjects").innerHTML = SUBJECTS.map(s =>
     `<button class="subj" data-subj="${s.k}">${s.name}<small>${s.note}</small></button>`).join("");
-  document.querySelectorAll(".ai-name").forEach(el => el.textContent = currentAI().name);
 
   const a = state.active;
   $("home-idle").hidden = !!a;
   $("home-active").hidden = !a;
   if (a) {
     const s = subjOf(a.subject);
+    const steps = stepsFor(s);
     $("a-subj").textContent = s.name;
-    $("a-prompt").textContent = PROMPTS[s.k](s);
-    $("a-tip").textContent = TIPS[s.k];
-    $("a-open").href = currentAI().url;
+    $("a-steps").innerHTML = steps.map((st, i) => `
+      <div class="step"><div class="no">${i + 1}</div>
+        <div class="body"><h3>${st.t}</h3>${st.html}</div></div>`).join("");
+    $("a-paste-no").textContent = steps.length + 1;
     if ($("a-paste").value !== (a.draft || "")) $("a-paste").value = a.draft || "";
     tick();
   }
@@ -661,10 +707,16 @@ $("subjects").addEventListener("click", e => {
   window.scrollTo(0, 0);
 });
 
-$("a-open").addEventListener("click", () => {
+$("a-steps").addEventListener("click", e => {
+  if (!e.target.closest(".copy-prompt") || !state.active) return;
   const s = subjOf(state.active.subject);
   copyText(PROMPTS[s.k](s));
   toast("お願い文をコピーしたよ");
+});
+$("setup-done").addEventListener("click", () => {
+  state.setupDone = true;
+  save();
+  renderHome();
 });
 
 $("a-paste").addEventListener("input", () => {
@@ -726,7 +778,7 @@ document.querySelectorAll("[data-extra]").forEach(b => {
   b.addEventListener("click", () => {
     copyText(EXTRAS[b.dataset.extra]);
     toast("お願い文をコピーしたよ");
-    window.open(currentAI().url, "_blank", "noopener");
+    window.open(GPT_URL, "_blank", "noopener");
   });
 });
 
@@ -749,7 +801,7 @@ function renderQuiz() {
   $("quiz-end").hidden = !(quiz && quiz.done);
   $("quiz-start").hidden = !!quiz;
   if (!list.length) {
-    $("quiz-info").innerHTML = "まだカードがないよ。<br>予習でAIの返事を貼りつけると、ここにカードがたまるよ。";
+    $("quiz-info").innerHTML = "まだカードがないよ。<br>予習でChatGPTの返事を貼りつけると、ここにカードがたまるよ。";
     $("quiz-go").hidden = true;
   } else {
     $("quiz-info").innerHTML = `カード <b>${list.length}枚</b>（まだ覚えていない <b>${notYet}枚</b>）`;
@@ -832,7 +884,7 @@ function renderNotes() {
       </div>
       <ul>${n.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
     </div>`).join("")
-    : '<p class="empty">まだまとめがないよ。<br>予習でAIの返事を貼りつけると、ここにたまるよ。</p>';
+    : '<p class="empty">まだまとめがないよ。<br>予習でChatGPTの返事を貼りつけると、ここにたまるよ。</p>';
 }
 $("note-chips").addEventListener("click", e => {
   const b = e.target.closest("[data-f]");
@@ -879,8 +931,6 @@ function renderLog() {
     return m ? `${s.name}${m}分` : "";
   }).filter(Boolean).join("・");
   $("chart-info").innerHTML = `<b>${md(days[i])}</b>：${vals[i]}分${bySubj ? `（${bySubj}）` : ""}`;
-
-  document.querySelectorAll("#ai-seg button").forEach(b => b.classList.toggle("on", b.dataset.ai === state.ai));
 }
 $("bars").addEventListener("click", e => {
   const b = e.target.closest("[data-i]");
@@ -888,13 +938,10 @@ $("bars").addEventListener("click", e => {
   selDay = +b.dataset.i;
   renderLog();
 });
-$("ai-seg").addEventListener("click", e => {
-  const b = e.target.closest("[data-ai]");
-  if (!b) return;
-  state.ai = b.dataset.ai;
-  save();
-  renderLog();
-  toast(`${currentAI().name} を使う設定にしたよ`);
+$("rules-text").textContent = RULES;
+$("copy-rules").addEventListener("click", () => {
+  copyText(RULES);
+  toast("ルールをコピーしたよ。ChatGPTの「指示」に貼ってね");
 });
 $("report").addEventListener("click", () => {
   const today = new Date();
@@ -964,7 +1011,7 @@ $("tabs").addEventListener("click", e => {
   const b = e.target.closest("[data-tab]");
   if (b) show(b.dataset.tab);
 });
-// AIアプリから戻ってきたときに、時間などを最新にする
+// ChatGPTから戻ってきたときに、時間などを最新にする
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") { state = load(); const on = document.querySelector("#tabs button.on"); RENDER[on.dataset.tab](); }
 });

@@ -154,6 +154,25 @@
   details.qa .ans p:last-child { margin-bottom: 0; }
 
   .rules li { margin-bottom: 8px; }
+  .copybtn {
+    display: block; width: 100%; margin-top: 10px;
+    padding: 12px; border-radius: 12px; border: 1.5px solid var(--accent);
+    background: transparent; color: var(--accent); font: inherit; font-weight: 700; cursor: pointer;
+  }
+  .rules-box { margin-top: 8px; }
+  .rules-box summary { color: var(--accent); font-size: .88rem; cursor: pointer; }
+  pre.prompt {
+    white-space: pre-wrap; overflow-wrap: anywhere;
+    font-family: inherit; font-size: .8rem;
+    background: var(--bg); border: 1px dashed var(--line);
+    border-radius: 12px; padding: 10px; margin: 8px 0 0;
+  }
+  .toast {
+    position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%);
+    background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 99px;
+    font-size: .9rem; opacity: 0; pointer-events: none; transition: opacity .2s; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
   footer { margin-top: 40px; text-align: center; color: var(--sub); font-size: .85rem; }
 </style>
 </head>
@@ -162,13 +181,13 @@
 
   <span class="tag">使い方ガイド</span>
   <h1>予習サクッと の使い方</h1>
-  <p>AIに調べものを任せて、予習を<b>1日30分</b>にするアプリです。<br>5分で読めます。わからなくなったら、いつでもここに戻ってきてね。</p>
+  <p>ChatGPTに調べものを任せて、予習を<b>1日30分</b>にするアプリです。<br>5分で読めます。わからなくなったら、いつでもここに戻ってきてね。</p>
   <a class="btn" href="./">アプリを開く</a>
 
   <nav class="toc" aria-label="もくじ">
     <a href="#junbi">① 最初の準備</a>
     <a href="#yoshu">② 毎日の予習</a>
-    <a href="#aikotoba">③ AIへの合言葉</a>
+    <a href="#aikotoba">③ 合言葉と便利ワザ</a>
     <a href="#quiz">④ クイズとまとめ</a>
     <a href="#kiroku">⑤ 記録と報告</a>
     <a href="#komatta">⑥ 困ったとき</a>
@@ -179,7 +198,7 @@
     <h3>使う場面は3つだけ</h3>
     <div class="scene" style="margin-top:10px">
       <div class="icon">🏠</div>
-      <div><div class="time">家で・1教科10分</div>教科書を撮って、AIに下調べしてもらう</div>
+      <div><div class="time">家で・1教科10分</div>教科書をChatGPTに送って、下調べしてもらう</div>
     </div>
     <div class="scene">
       <div class="icon">🚃</div>
@@ -200,8 +219,23 @@
         <p class="sub">「勉強にAI（ChatGPT）を使いたい」と伝えよう。18歳未満は保護者のOKが必要です。</p>
       </li>
       <li>
-        <h3>ChatGPT を入れる</h3>
-        <p class="sub">App Store で「ChatGPT」と検索。作っている会社が <b>OpenAI</b> になっているものを入れる（似た名前のニセモノに注意）。Apple か Google のアカウントでログイン。有料プランは選ばなくてOK。</p>
+        <h3>ChatGPT にログインしておく</h3>
+        <p class="sub">無料のままでOK。有料プランをすすめられても選ばなくて大丈夫。</p>
+      </li>
+      <li>
+        <h3>ChatGPTにプロジェクト「予習」を作る</h3>
+        <p class="sub">ChatGPTの左上のメニュー → 「プロジェクト」の<b>「新しいプロジェクト」</b>→ 名前に「予習」と入れて作成。</p>
+        <div class="point" style="margin-top:8px">プロジェクトは「予習専用の部屋」。この部屋の中のチャットは、次に覚えさせるルールを毎回守ってくれるよ。</div>
+      </li>
+      <li>
+        <h3>「予習のルール」を覚えさせる</h3>
+        <p class="sub">下のボタンでルールをコピー → プロジェクト「予習」を開く → 右上の「…」→ <b>プロジェクトの設定</b> →<b>「指示」</b>の欄に貼って保存。</p>
+        <button class="copybtn" id="copy-rules">予習のルールをコピー</button>
+        <details class="rules-box">
+          <summary>ルールの中身を見る</summary>
+          <pre class="prompt" id="rules"></pre>
+        </details>
+        <p class="sub" style="margin-top:8px">ボタンの名前が少しちがうこともあるよ。どうしても見つからなければ、アプリの予習画面にある「プロジェクトを作っていないときは」のお願い文を使えばOK。</p>
       </li>
       <li>
         <h3>このアプリをホーム画面に置く</h3>
@@ -209,8 +243,8 @@
         <div class="point" style="margin-top:8px">置いたあとは、<b>いつもホーム画面のアイコンから開く</b>こと。Safariから開くのとは記録が別々になっちゃうよ。ホーム画面から開くと、記録も消えにくくなる。</div>
       </li>
       <li>
-        <h3>（Gemini を使う人だけ）AIを切りかえる</h3>
-        <p class="sub">アプリの「📊記録」→「使うAI」で Gemini を選ぶ。ChatGPT の人は何もしなくてOK。</p>
+        <h3>アプリの「もう準備できた」を押す</h3>
+        <p class="sub">予習画面の上に出ている「はじめに」のお知らせが消えるよ。</p>
       </li>
     </ol>
   </div>
@@ -227,25 +261,34 @@
         </div>
       </li>
       <li>
-        <h3>「コピーして ChatGPT を開く」を押す</h3>
-        <p class="sub">AIへのお願い文が自動でコピーされて、ChatGPTが開くよ。</p>
-        <div class="mock"><span class="mbtn">コピーして ChatGPT を開く</span></div>
+        <h3>英語だけ：カメラで英文をコピーする</h3>
+        <p class="sub">iPhoneのカメラを教科書の英文に向ける → 右下の<b>文字読み取りマーク</b>（枠の中に線）→「すべてを選択」→「コピー」。</p>
+        <div class="point" style="margin-top:8px">無料版のChatGPTは、<b>写真を送れる回数が1日数回まで</b>。英語は文字で送って、写真は数学や国語のために取っておこう。</div>
       </li>
       <li>
-        <h3>教科書を撮って、お願い文を貼って送る</h3>
-        <p class="sub">ChatGPTで「＋」→「カメラ」→ 明日やる教科書のページを撮る → 入力欄を長押し →「ペースト」→ 送信。</p>
+        <h3>ChatGPTを開いて、プロジェクト「予習」で新しいチャット</h3>
+        <p class="sub">アプリの「ChatGPT を開く」を押す → 左上のメニュー → 「予習」→ 新しいチャット。</p>
+        <div class="mock"><span class="mbtn">ChatGPT を開く</span></div>
+        <p class="sub" style="margin-top:6px"><b>必ず「予習」の中で始めること。</b>外で始めるとルールが効かないよ。</p>
+      </li>
+      <li>
+        <h3>教科名を打って送る</h3>
+        <p class="sub"><b>英語</b>：「英語」と打って改行 → 長押しして「ペースト」→ 送信<br><b>ほかの教科</b>：「数学」などと打つ →「＋」→「カメラ」で明日やるページを撮る → 送信</p>
+        <div class="mock chat">
+          <div class="bubble me">英語<br>Many students take part in volunteer activities…</div>
+        </div>
       </li>
       <li>
         <h3>ヒントを見て、自分で考える</h3>
-        <p class="sub">AIは最初、答えではなく<b>ヒント</b>を出すよ。自分で考えてから「答え合わせ」と送ろう（合言葉は次の③で）。</p>
+        <p class="sub">ChatGPTは最初、答えではなく<b>ヒント</b>を出すよ。自分で考えてから「答え合わせ」と送ろう（合言葉は次の③で）。</p>
         <div class="mock chat">
           <div class="bubble ai"><b>1文目のヒント</b><br>主語は "Many students"。動詞を探してみよう。</div>
           <div class="bubble me">答え合わせ</div>
         </div>
       </li>
       <li>
-        <h3>AIの返事をアプリに貼る</h3>
-        <p class="sub">AIの返事の最後に【まとめ】と【カード】が出てくる。返事を長押し →「コピー」→ アプリに戻って貼りつけ →「カードとまとめを保存」。</p>
+        <h3>最初の返事をアプリに貼る</h3>
+        <p class="sub">最初の返事の最後に【まとめ】と【カード】が出てくる。返事の下の<b>コピーボタン</b>（四角が2つ重なったマーク）→ アプリに戻って貼りつけ →「カードとまとめを保存」。</p>
         <div class="mock"><span class="mbtn ghost">カードとまとめを保存</span>
           <div style="margin-top:6px;color:var(--accent);font-weight:700">保存したよ！ 新しいカード 8枚／まとめ 1件</div>
         </div>
@@ -259,9 +302,9 @@
   </div>
 
   <!-- ③ 合言葉 -->
-  <h2 id="aikotoba"><span class="num">3</span>AIへの合言葉</h2>
+  <h2 id="aikotoba"><span class="num">3</span>合言葉と便利ワザ</h2>
   <div class="card">
-    <p class="sub">お願い文にルールが書いてあるので、これを送るだけでAIが動いてくれるよ。</p>
+    <p class="sub">「予習のルール」に書いてあるので、これを送るだけでChatGPTが動いてくれるよ。</p>
     <table>
       <tr><th>送る言葉</th><th>こうなる</th></tr>
       <tr><td class="word">次</td><td>次のヒントが出る（数学で使う）</td></tr>
@@ -276,8 +319,18 @@
     <p class="sub">「📷予習」の下の「こんなときは」から使えるよ。</p>
     <table>
       <tr><td class="word">問題がわからない</td><td>答えは教えず、ヒントを1つずつ出してもらう</td></tr>
-      <tr><td class="word">先生役モード</td><td>週末に、習ったことをAIに説明する。まちがいを見つけてもらえる。人に説明すると一番覚えるよ</td></tr>
+      <tr><td class="word">先生役モード</td><td>週末に、習ったことをChatGPTに説明する。まちがいを見つけてもらえる。人に説明すると一番覚えるよ</td></tr>
       <tr><td class="word">中学の内容</td><td>あやふやな中学の内容を3行で教えてもらって、確認問題を解く</td></tr>
+    </table>
+    <p class="sub" style="margin:10px 0 0">これも、プロジェクト「予習」の中の新しいチャットで使ってね。</p>
+  </div>
+
+  <div class="card">
+    <h3>ChatGPTの便利ワザ</h3>
+    <table>
+      <tr><td class="word">声で話す</td><td>入力欄の右にある音声のボタンで、しゃべって送れる。先生役モードは、声で説明するとラク</td></tr>
+      <tr><td class="word">読み上げ</td><td>返事を長押しすると、声で読み上げてもらえる。英文の読み方を聞きたいときに</td></tr>
+      <tr><td class="word">もっとかんたんに</td><td>説明がむずかしいときは「もっとかんたんに」と送ればOK</td></tr>
     </table>
   </div>
 
@@ -309,27 +362,35 @@
   <!-- ⑥ 困ったとき -->
   <h2 id="komatta"><span class="num">6</span>困ったとき</h2>
   <details class="qa">
-    <summary>貼ったのに「カードとまとめが見つからなかった」と出る</summary>
+    <summary>ChatGPTがいきなり答えを出す／ルールを守らない</summary>
     <div class="ans">
-      <p>AIが決まった形で答えなかったのが原因。ChatGPTに<br><b>「【まとめ】と【カード】の形で出して」</b><br>と送ってから、その返事をもう一度貼ってね。</p>
+      <p>プロジェクト「予習」の外でチャットを始めているかも。左上のメニューから「予習」を開いて、その中で新しいチャットを始めてね。</p>
+      <p>それでもダメなら「ルールどおり、ヒントからにして」と送ってみて。</p>
     </div>
   </details>
   <details class="qa">
-    <summary>ChatGPTに貼りつけても何も出てこない</summary>
+    <summary>貼ったのに「カードとまとめが見つからなかった」と出る</summary>
     <div class="ans">
-      <p>コピーがうまくいかなかったのかも。アプリの「お願い文を見る」を開いて、文を長押しして自分でコピーしてね。</p>
+      <p>ChatGPTが決まった形で答えなかったのが原因。ChatGPTに<br><b>「【まとめ】と【カード】の形で出して」</b><br>と送ってから、その返事をもう一度貼ってね。</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>写真が送れない／「上限」と出た</summary>
+    <div class="ans">
+      <p>無料版は、写真を送れる回数が1日数回までと決まっているよ。時間がたつとまた送れるようになる。</p>
+      <p>そのあいだは、カメラの<b>文字読み取り</b>で教科書の文字をコピーして、文字で送ればOK（英語と同じやり方）。数式が多い数学は、写真のほうが正確だよ。</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>カメラに文字読み取りマークが出ない</summary>
+    <div class="ans">
+      <p>教科書に少し近づけて、文字がはっきり写るようにしてみて。それでも出ないときは、写真アプリで撮った写真を開いて、文字を長押ししてもコピーできるよ。</p>
     </div>
   </details>
   <details class="qa">
     <summary>ChatGPTのアプリじゃなくて、Safariが開く</summary>
     <div class="ans">
-      <p>そのままSafariでログインして使ってもOK。アプリで使いたいときは、コピーしたあと自分でChatGPTのアプリを開いて貼ればOK。</p>
-    </div>
-  </details>
-  <details class="qa">
-    <summary>「今日はこれ以上使えません」みたいに出た</summary>
-    <div class="ans">
-      <p>無料版は、1日に使える回数に上限があるよ。時間をおくとまた使える。急ぐときは Gemini（無料）に切りかえてもOK（「📊記録」→「使うAI」）。</p>
+      <p>そのままSafariでログインして使ってもOK。アプリで使いたいときは、自分でChatGPTのアプリを開けばOK。</p>
     </div>
   </details>
   <details class="qa">
@@ -357,13 +418,61 @@
   <div class="card">
     <ol class="rules" style="margin:0;padding-left:1.3em">
       <li><b>答えを丸写ししない。</b>まずヒント、答え合わせは最後。</li>
-      <li><b>AIもまちがえる。</b>おかしいと思ったら教科書や先生を信じる。</li>
-      <li><b>個人情報は送らない。</b>名前・住所・学校名・顔が写った写真などはAIに送らない。</li>
+      <li><b>ChatGPTもまちがえる。</b>おかしいと思ったら教科書や先生を信じる。</li>
+      <li><b>個人情報は送らない。</b>名前・住所・学校名・顔が写った写真などはChatGPTに送らない。</li>
     </ol>
   </div>
 
   <a class="btn" href="./" style="margin-top:28px">アプリを開く</a>
   <footer>がんばりすぎず、サクッといこう。</footer>
 </div>
+<div class="toast" id="toast"></div>
+<script>
+// アプリ（index.html）の RULES と同じ文。変えるときは両方直す
+const RULES = `あなたは高校1年生の予習を手伝う先生です。このプロジェクトのチャットでは、次のルールを守ってください。
+
+■教科
+最初のメッセージに書いてある教科（英語・数学・現代文・古文・漢文）の先生として答えてください。書いていなければ、写真や文章から判断してください。
+
+■いつものルール
+・答えや全文の訳を、いきなり出さない。まずヒントを出す。
+・中学生にもわかる言葉で、短く説明する。
+・私が「次」と送ったら、次のヒントを出す。
+・私が「答え合わせ」と送ったら、全文の訳・解き方・質問の答えを出す。
+・私が「降参」と送ったら、最初からていねいに説明する。
+
+■教科ごとにやること
+英語：1文ずつ意味をつかむヒント／大事な文法を1つ／授業で聞かれそうな質問を3つ（答えはまだ出さない）
+数学：このページで習うことを3行で説明／例題の解き方のヒントを1段ずつ／必要な中学の内容を1つ
+現代文：むずかしい言葉の説明／筆者の言いたいことを見つけるヒント／授業で聞かれそうな質問を3つ（答えはまだ出さない）
+古文・漢文：大事な古語や句法の意味／大事な文法を1つ／1文ずつ現代語訳のヒント
+
+■最初の返事の最後に、アプリに保存するため、必ず次の形をつける（予習以外のお願いのときは、つけなくてよい）
+【まとめ】
+・授業の前に見返すポイントを3つ（1行に1つ）
+【カード】
+覚えること｜意味
+（1行に1つ、10個まで。表にしないで「｜」で区切る）`;
+
+document.getElementById("rules").textContent = RULES;
+document.getElementById("copy-rules").addEventListener("click", () => {
+  let ok = false;
+  const ta = document.createElement("textarea");
+  ta.value = RULES;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  ta.setSelectionRange(0, RULES.length);
+  try { ok = document.execCommand("copy"); } catch (e) {}
+  ta.remove();
+  if (!ok && navigator.clipboard) { navigator.clipboard.writeText(RULES).catch(() => {}); ok = true; }
+  const t = document.getElementById("toast");
+  t.textContent = ok ? "コピーしたよ。ChatGPTの「指示」に貼ってね" : "コピーできなかった。中身を長押ししてコピーしてね";
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2400);
+});
+</script>
 </body>
 </html>
