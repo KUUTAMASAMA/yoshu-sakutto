@@ -17,6 +17,7 @@
     --sub: #62676d;
     --line: #e4e0d8;
     --accent: #2f6f5e;
+    --on-accent: #ffffff;
     --accent-soft: #e3efe9;
     --warm: #c0643c;
     --warm-soft: #f8e8df;
@@ -30,6 +31,7 @@
       --sub: #a3a7ad;
       --line: #34383e;
       --accent: #6fbfa6;
+      --on-accent: #0f2420;
       --accent-soft: #24352f;
       --warm: #e38c64;
       --warm-soft: #3a2a22;
@@ -55,7 +57,7 @@
   h2 .num {
     display: inline-grid; place-items: center; flex: none;
     width: 30px; height: 30px; border-radius: 50%;
-    background: var(--accent); color: #fff; font-size: .9rem;
+    background: var(--accent); color: var(--on-accent); font-size: .9rem;
   }
   h3 { font-size: 1rem; margin: 0 0 4px; }
   p { margin: 0 0 12px; }
@@ -73,7 +75,7 @@
   .btn {
     display: block; text-align: center; text-decoration: none;
     padding: 14px; border-radius: 14px; font-weight: 700;
-    background: var(--accent); color: #fff;
+    background: var(--accent); color: var(--on-accent);
   }
 
   /* もくじ */
@@ -112,7 +114,7 @@
     padding: 10px; margin-top: 8px; font-size: .85rem;
   }
   .mock .mbtn {
-    display: inline-block; background: var(--accent); color: #fff; font-weight: 700;
+    display: inline-block; background: var(--accent); color: var(--on-accent); font-weight: 700;
     padding: 6px 12px; border-radius: 10px; font-size: .82rem;
   }
   .mock .mbtn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
@@ -126,7 +128,7 @@
   /* チャット */
   .chat { display: grid; gap: 8px; }
   .bubble { padding: 10px 12px; border-radius: 14px; font-size: .88rem; max-width: 90%; }
-  .bubble.me { background: var(--accent); color: #fff; justify-self: end; border-bottom-right-radius: 4px; }
+  .bubble.me { background: var(--accent); color: var(--on-accent); justify-self: end; border-bottom-right-radius: 4px; }
   .bubble.ai { background: var(--chat-ai); justify-self: start; border-bottom-left-radius: 4px; }
 
   /* 合言葉 */
@@ -183,6 +185,7 @@
   <h1>予習サクッと の使い方</h1>
   <p>ChatGPTに調べものを任せて、予習を<b>1日30分</b>にするアプリです。<br>5分で読めます。わからなくなったら、いつでもここに戻ってきてね。</p>
   <a class="btn" href="./">アプリを開く</a>
+  <a href="demo.html" style="display:block;text-align:center;margin-top:10px;font-weight:700">▶ 使ってみた例（英語）を見る</a>
 
   <nav class="toc" aria-label="もくじ">
     <a href="#junbi">① 最初の準備</a>

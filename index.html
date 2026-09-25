@@ -19,6 +19,7 @@
     --sub: #62676d;
     --line: #e4e0d8;
     --accent: #2f6f5e;
+    --on-accent: #ffffff;
     --accent-soft: #e3efe9;
     --warm: #c0643c;
     --warm-soft: #f8e8df;
@@ -33,6 +34,7 @@
       --sub: #a3a7ad;
       --line: #34383e;
       --accent: #6fbfa6;
+      --on-accent: #0f2420;
       --accent-soft: #24352f;
       --warm: #e38c64;
       --warm-soft: #3a2a22;
@@ -75,7 +77,7 @@
     display: block; width: 100%; text-align: center; text-decoration: none;
     padding: 14px; border-radius: 14px;
     font-size: 1rem; font-weight: 700;
-    background: var(--accent); color: #fff;
+    background: var(--accent); color: var(--on-accent);
   }
   .btn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
   .btn.plain { background: transparent; color: var(--sub); border: 1px solid var(--line); font-weight: 500; }
@@ -107,7 +109,7 @@
   /* 予習中 */
   .timer {
     display: flex; align-items: center; justify-content: space-between;
-    background: var(--accent); color: #fff; border-radius: 16px;
+    background: var(--accent); color: var(--on-accent); border-radius: 16px;
     padding: 12px 16px; margin-bottom: 14px;
   }
   .timer b { font-size: 1.6rem; font-variant-numeric: tabular-nums; }
@@ -116,7 +118,7 @@
   .step + .step { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--line); }
   .step .no {
     flex: none; width: 28px; height: 28px; border-radius: 50%;
-    background: var(--accent); color: #fff; display: grid; place-items: center;
+    background: var(--accent); color: var(--on-accent); display: grid; place-items: center;
     font-size: .85rem; font-weight: 700;
   }
   .step .body { flex: 1; min-width: 0; }
@@ -157,7 +159,7 @@
     flex: none; border: 1px solid var(--line); background: var(--card); color: var(--text);
     border-radius: 99px; padding: 5px 12px; font-size: .85rem;
   }
-  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
   /* クイズ */
   .flash {
@@ -169,8 +171,8 @@
   .qcount { display: flex; justify-content: space-between; font-size: .85rem; color: var(--sub); margin-bottom: 8px; }
   .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .judge button { padding: 18px 8px; border-radius: 16px; font-size: 1.1rem; font-weight: 700; }
-  .judge .ok { background: var(--accent); color: #fff; }
-  .judge .ng { background: var(--warm); color: #fff; }
+  .judge .ok { background: var(--accent); color: var(--on-accent); }
+  .judge .ng { background: var(--warm); color: var(--on-accent); }
   .result-big { font-size: 3rem; font-weight: 800; text-align: center; color: var(--accent); margin: 8px 0; }
 
   /* まとめ・カード一覧 */
@@ -212,7 +214,7 @@
 
   .seg { display: flex; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
   .seg button { flex: 1; padding: 10px; background: var(--card); color: var(--text); font-size: .95rem; }
-  .seg button.on { background: var(--accent); color: #fff; font-weight: 700; }
+  .seg button.on { background: var(--accent); color: var(--on-accent); font-weight: 700; }
 
   /* タブ */
   nav.tabs {
@@ -251,6 +253,7 @@
         <h2>はじめに：ChatGPTの準備（1回だけ）</h2>
         <p class="sub">ChatGPTに「予習のルール」を覚えさせておくと、毎回お願い文を貼らなくてよくなるよ。3分で終わる。</p>
         <a class="btn" href="guide.html#junbi">やり方を見る</a>
+        <a href="demo.html" style="display:block;text-align:center;margin-top:10px;font-weight:700;color:var(--accent)">▶ 使ってみた例を見る</a>
         <button class="btn plain" id="setup-done" style="margin-top:8px">もう準備できた</button>
       </div>
       <div class="tiles">

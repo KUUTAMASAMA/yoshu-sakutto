@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2f6f5e">
+<title>予習サクッと 使ってみた例</title>
+<meta name="description" content="英語の教科書1ページを、予習サクッととChatGPTで予習してみた実例">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --text: #1f2328;
+    --sub: #62676d;
+    --line: #e4e0d8;
+    --accent: #2f6f5e;
+    --on-accent: #ffffff;
+    --accent-soft: #e3efe9;
+    --warm: #c0643c;
+    --warm-soft: #f8e8df;
+    --paper: #fffdf7;
+    --gpt-bg: #ffffff;
+    --gpt-user: #f0f0f0;
+    --gpt-text: #0d0d0d;
+    --gpt-sub: #6b6b6b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17191c;
+      --card: #22252a;
+      --text: #eceae6;
+      --sub: #a3a7ad;
+      --line: #34383e;
+      --accent: #6fbfa6;
+      --on-accent: #0f2420;
+      --accent-soft: #24352f;
+      --warm: #e38c64;
+      --warm-soft: #3a2a22;
+      --paper: #26241f;
+      --gpt-bg: #212121;
+      --gpt-user: #303030;
+      --gpt-text: #ececec;
+      --gpt-sub: #a0a0a0;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+    line-height: 1.75;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 20px 16px calc(48px + env(safe-area-inset-bottom)); }
+  h1 { font-size: 1.5rem; line-height: 1.4; margin: 12px 0 8px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  .sub { color: var(--sub); font-size: .9rem; }
+  .tag {
+    display: inline-block; background: var(--accent-soft); color: var(--accent);
+    font-size: .78rem; font-weight: 700; padding: 1px 10px; border-radius: 99px;
+  }
+  .tag.warm { background: var(--warm-soft); color: var(--warm); }
+  .btn {
+    display: block; text-align: center; text-decoration: none;
+    padding: 14px; border-radius: 14px; font-weight: 700;
+    background: var(--accent); color: var(--on-accent);
+  }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+
+  /* 流れ */
+  .flow { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; font-size: .85rem; }
+  .flow span { background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 2px 10px; }
+  .flow b { color: var(--accent); }
+
+  /* 場面の見出し */
+  .scene-head {
+    display: flex; align-items: center; gap: 10px;
+    margin: 44px 0 14px; padding: 10px 14px;
+    background: var(--accent); color: var(--on-accent); border-radius: 14px;
+  }
+  .scene-head .icon { font-size: 1.4rem; }
+  .scene-head b { font-size: 1.05rem; }
+  .scene-head span { font-size: .82rem; opacity: .9; display: block; }
+
+  /* ステップ */
+  .step { position: relative; padding-left: 44px; margin-bottom: 28px; }
+  .step::before {
+    content: attr(data-no);
+    position: absolute; left: 0; top: 0;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent); color: var(--on-accent);
+    display: grid; place-items: center; font-weight: 700; font-size: .9rem;
+  }
+  .step::after {
+    content: ""; position: absolute; left: 15px; top: 38px; bottom: -22px;
+    border-left: 2px dashed var(--line);
+  }
+  .step:last-child::after { display: none; }
+  .where { font-size: .78rem; font-weight: 700; color: var(--sub); margin-bottom: 2px; }
+  .where.app { color: var(--accent); }
+  .where.chat { color: #7a5af0; }
+  @media (prefers-color-scheme: dark) { .where.chat { color: #b3a1ff; } }
+
+  /* スクリーンショット */
+  .shots {
+    display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+    padding: 4px 2px 10px; margin: 10px 0 0; -webkit-overflow-scrolling: touch;
+  }
+  .shots figure { flex: none; width: 230px; margin: 0; scroll-snap-align: start; }
+  .shots.one figure { width: min(270px, 100%); }
+  .phone {
+    border: 6px solid #1f2328; border-radius: 26px; overflow: hidden;
+    background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  }
+  .phone img { display: block; width: 100%; height: auto; }
+  figcaption { font-size: .82rem; color: var(--sub); text-align: center; margin-top: 6px; }
+  .swipe { font-size: .78rem; color: var(--sub); }
+
+  /* 教科書 */
+  .textbook {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px;
+    padding: 18px 18px 14px; box-shadow: 0 2px 0 var(--line);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+  .textbook .lesson { font-size: .78rem; letter-spacing: .08em; color: var(--warm); font-weight: 700; font-family: inherit; }
+  .textbook h3 { font-size: 1.25rem; margin: 2px 0 10px; }
+  .textbook p { font-size: 1rem; line-height: 1.9; margin: 0; }
+  .textbook .note { font-family: -apple-system, "Hiragino Sans", "Yu Gothic UI", sans-serif; font-size: .75rem; color: var(--sub); margin-top: 10px; }
+
+  /* カメラの文字読み取り（イメージ） */
+  .camera {
+    background: #111; border-radius: 22px; padding: 14px; position: relative; margin-top: 10px;
+    max-width: 320px;
+  }
+  .camera .view {
+    background: #f4f1e8; border-radius: 6px; padding: 12px; color: #222;
+    font-family: Georgia, serif; font-size: .8rem; line-height: 1.7;
+  }
+  .camera mark { background: rgba(10, 132, 255, .28); color: inherit; }
+  .camera .menu {
+    position: absolute; left: 50%; top: 22px; transform: translateX(-50%);
+    background: #2c2c2e; color: #fff; border-radius: 10px;
+    font-size: .78rem; display: flex; overflow: hidden; white-space: nowrap;
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+  .camera .menu span { padding: 6px 10px; }
+  .camera .menu span + span { border-left: 1px solid #48484a; }
+  .camera .menu span.hi { background: #0a84ff; }
+  .camera .bottom { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; }
+  .camera .bottom small { color: #ddd; font-size: .72rem; }
+  .livetext {
+    width: 34px; height: 34px; border-radius: 8px; background: #ffd60a;
+    display: grid; place-items: center;
+  }
+
+  /* ChatGPT（イメージ） */
+  .gpt {
+    background: var(--gpt-bg); color: var(--gpt-text);
+    border: 1px solid var(--line); border-radius: 18px; overflow: hidden; margin-top: 10px;
+    font-size: .88rem; line-height: 1.7;
+  }
+  .gpt .bar {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+    border-bottom: 1px solid var(--line); font-weight: 700; font-size: .85rem;
+  }
+  .gpt .bar small { color: var(--gpt-sub); font-weight: 500; }
+  .gpt .body { padding: 14px; display: grid; gap: 14px; }
+  .gpt .user {
+    justify-self: end; max-width: 88%;
+    background: var(--gpt-user); border-radius: 18px; padding: 8px 14px; white-space: pre-wrap;
+  }
+  .gpt .user .img {
+    display: inline-block; font-size: .75rem; padding: 1px 8px; border-radius: 6px;
+    background: rgba(0,0,0,.08); margin-bottom: 4px;
+  }
+  .gpt .ai { white-space: normal; }
+  .gpt .ai h4 { font-size: .9rem; margin: 12px 0 4px; }
+  .gpt .ai h4:first-child { margin-top: 0; }
+  .gpt .ai ol, .gpt .ai ul { margin: 0; padding-left: 1.3em; }
+  .gpt .ai li { margin-bottom: 4px; }
+  .gpt .ai .hint { color: var(--gpt-sub); }
+  .gpt .ai .fmt { background: rgba(47, 111, 94, .08); border-radius: 10px; padding: 8px 10px; margin-top: 10px; }
+  .gpt .ai .more { color: var(--gpt-sub); font-size: .8rem; }
+  .gpt .tools { display: flex; gap: 14px; align-items: center; margin-top: 8px; color: var(--gpt-sub); }
+  .gpt .tools svg { width: 18px; height: 18px; }
+  .gpt .tools .copy { position: relative; color: var(--warm); }
+  .gpt .tools .copy::after {
+    content: "ここを押してコピー"; position: absolute; left: 26px; top: -3px; white-space: nowrap;
+    background: var(--warm); color: var(--on-accent); font-size: .72rem; font-weight: 700;
+    padding: 1px 8px; border-radius: 99px;
+  }
+  .gpt .input {
+    margin: 0 14px 14px; border: 1px solid var(--line); border-radius: 24px;
+    padding: 8px 14px; color: var(--gpt-sub); font-size: .82rem; display: flex; justify-content: space-between;
+  }
+  .caption-img { font-size: .75rem; color: var(--sub); margin-top: 4px; }
+
+  .point {
+    border-left: 4px solid var(--accent); background: var(--accent-soft);
+    padding: 10px 12px; border-radius: 8px; font-size: .92rem; margin-top: 10px;
+  }
+  .point.warm { border-color: var(--warm); background: var(--warm-soft); }
+  .total {
+    text-align: center; background: var(--card); border: 1px solid var(--line);
+    border-radius: 16px; padding: 16px; margin: 8px 0 0;
+  }
+  .total b { font-size: 1.6rem; color: var(--accent); }
+  footer { margin-top: 40px; text-align: center; color: var(--sub); font-size: .85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="tag">使ってみた例</span>
+  <h1>英語の予習を、<br>実際にやってみた</h1>
+  <p>教科書の1ページを「予習サクッと」とChatGPTで予習すると、どうなるかを順番に見せるよ。<br>アプリの画面は、<b>本物のアプリを実際に動かして撮ったもの</b>です。</p>
+  <div class="flow">
+    <span>🏠 <b>家で</b> 約10分</span>
+    <span>🚃 <b>電車で</b> 5分</span>
+    <span>⏰ <b>授業前</b> 5分</span>
+  </div>
+
+  <!-- 教科書 -->
+  <h2 style="margin-top:32px">今回予習する教科書のページ</h2>
+  <div class="textbook">
+    <div class="lesson">LESSON 3</div>
+    <h3>Small Actions, Big Changes</h3>
+    <p>Many people in Japan throw away food that can still be eaten. This problem is called food loss. Some students at a high school in Osaka decided to take action. They started a project to share extra vegetables from local farms with families in their town. At first, only a few people took part in the project. However, after they introduced it on social media, more and more people joined them. Now they say, "Even small actions can make a big difference."</p>
+    <div class="note">※ このデモのために作った文章です（本物の教科書ではありません）</div>
+  </div>
+
+  <!-- ===== 家で ===== -->
+  <div class="scene-head"><span class="icon">🏠</span><div><b>家で予習する</b><span>1教科 約10分</span></div></div>
+
+  <div class="step" data-no="1">
+    <div class="where app">予習サクッと</div>
+    <h2>「英語」を押す</h2>
+    <p class="sub" style="margin:0">押すとタイマーが動いて、やることが順番に出てくる。</p>
+    <div class="shots">
+      <figure><div class="phone"><a href="demo/01-home.jpg"><img src="demo/01-home.jpg" alt="予習サクッとのはじめの画面。英語・数学・現代文・古文漢文のボタンが並んでいる" width="600" height="1200" loading="lazy"></a></div><figcaption>①「英語」を押す</figcaption></figure>
+      <figure><div class="phone"><a href="demo/02-steps.jpg"><img src="demo/02-steps.jpg" alt="英語を押したあとの画面。タイマーと、やることの手順が表示されている" width="600" height="1200" loading="lazy"></a></div><figcaption>② 手順が出る</figcaption></figure>
+    </div>
+    <div class="swipe">← 横にスワイプできるよ／画像を押すと大きく見られるよ</div>
+  </div>
+
+  <div class="step" data-no="2">
+    <div class="where">iPhoneのカメラ</div>
+    <h2>教科書の英文をコピーする</h2>
+    <p class="sub" style="margin:0">カメラを英文に向けて、右下の<b>黄色いマーク</b>を押す →「すべてを選択」→「コピー」。</p>
+    <div class="camera" aria-label="カメラの文字読み取りのイメージ">
+      <div class="menu"><span class="hi">コピー</span><span>すべてを選択</span><span>調べる</span></div>
+      <div class="view" style="padding-top:48px">
+        <mark>Many people in Japan throw away food that can still be eaten. This problem is called food loss. Some students at a high school in Osaka decided to take action. They started a project to share extra vegetables…</mark>
+      </div>
+      <div class="bottom">
+        <small>文字読み取りマーク →</small>
+        <div class="livetext" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 10h8M8 14h5"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="caption-img">カメラの画面のイメージ</div>
+    <div class="point">写真を送るより、<b>写真の回数（1日数回まで）を節約</b>できる。数学などは写真でOK。</div>
+  </div>
+
+  <div class="step" data-no="3">
+    <div class="where chat">ChatGPT</div>
+    <h2>プロジェクト「予習」で送る</h2>
+    <p class="sub" style="margin:0">「予習」の中で新しいチャットを開いて、「英語」と打って改行 → ペースト → 送信。</p>
+    <div class="gpt">
+      <div class="bar">予習 <small>›　新しいチャット</small></div>
+      <div class="body">
+        <div class="user">英語
+Many people in Japan throw away food that can still be eaten. This problem is called food loss. Some students at a high school in Osaka decided to take action. …(ここに全文)</div>
+      </div>
+    </div>
+    <div class="caption-img">ChatGPTの画面のイメージ</div>
+  </div>
+
+  <div class="step" data-no="4">
+    <div class="where chat">ChatGPT</div>
+    <h2>ヒントが返ってくる</h2>
+    <p class="sub" style="margin:0">いきなり答えは出ない。<b>ヒントを見て、まず自分で訳してみる。</b></p>
+    <div class="gpt">
+      <div class="body">
+        <div class="ai">
+          <h4>■ 1文ずつのヒント</h4>
+          <ol>
+            <li>Many people in Japan throw away food that can still be eaten.<br><span class="hint">→ that から後ろは、前の food をくわしく説明しているよ。「どんな食べ物？」と考えてみよう。</span></li>
+            <li>This problem is called food loss.<br><span class="hint">→ be called ～ の形。意味はカードで確認しよう。</span></li>
+            <li>Some students at a high school in Osaka decided to take action.<br><span class="hint">→ decided to ～ は「～することに決めた」。</span></li>
+          </ol>
+          <div class="more">（7文目まで続く）</div>
+          <h4>■ 大事な文法：関係代名詞の that</h4>
+          <p style="margin:0">food that can still be eaten のように、that のあとが前の名詞をくわしく説明する形だよ。</p>
+          <h4>■ 授業で聞かれそうな質問（答えはまだ出しません）</h4>
+          <p style="margin:0">Q1. What is food loss?<br>Q2. What did the students start?<br>Q3. Why did more people join the project?</p>
+          <div class="fmt">
+            <b>【まとめ】</b><br>
+            ・食べられるのに捨てられる食べ物（food loss）についての話<br>
+            ・that のあとが前の名詞を説明する（関係代名詞）<br>
+            ・生徒たちの小さな行動がSNSで広がり、大きな変化になった<br>
+            <b>【カード】</b><br>
+            throw away｜捨てる<br>
+            be called ～｜～と呼ばれる<br>
+            take action｜行動を起こす<br>
+            <span class="more">（10個まで続く）</span>
+          </div>
+          <div class="tools" aria-label="返事の下のボタン">
+            <span class="copy" aria-label="コピー"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption-img">ChatGPTの返事の例（実際の返事は毎回少しずつちがうよ）</div>
+    <div class="point">最後の<b>【まとめ】【カード】</b>が、アプリに保存される部分。</div>
+  </div>
+
+  <div class="step" data-no="5">
+    <div class="where chat">ChatGPT</div>
+    <h2>自分で考えたら「答え合わせ」</h2>
+    <div class="gpt">
+      <div class="body">
+        <div class="user">答え合わせ</div>
+        <div class="ai">
+          <h4>■ 全文の訳</h4>
+          <p style="margin:0">日本では多くの人が、まだ食べられる食べ物を捨てています。この問題はフードロスと呼ばれています。大阪のある高校の生徒たちは、行動を起こすことにしました。…</p>
+          <h4>■ 質問の答え</h4>
+          <p style="margin:0">Q1. Food that can still be eaten but is thrown away. …</p>
+        </div>
+      </div>
+    </div>
+    <div class="caption-img">ChatGPTの返事の例</div>
+    <div class="point warm">自分の訳と答え合わせして、ちがったところだけ覚えればOK。</div>
+  </div>
+
+  <div class="step" data-no="6">
+    <div class="where app">予習サクッと</div>
+    <h2>最初の返事をアプリに貼って保存</h2>
+    <p class="sub" style="margin:0">ステップ4の返事の<b>コピーボタン</b>を押す → アプリに戻って貼る →「カードとまとめを保存」。</p>
+    <div class="shots">
+      <figure><div class="phone"><a href="demo/03-paste.jpg"><img src="demo/03-paste.jpg" alt="ChatGPTの返事を貼りつけた画面" width="600" height="1200" loading="lazy"></a></div><figcaption>① 貼りつけて「保存」</figcaption></figure>
+      <figure><div class="phone"><a href="demo/04-saved.jpg"><img src="demo/04-saved.jpg" alt="新しいカード10枚、まとめ1件を保存したと表示されている" width="600" height="1200" loading="lazy"></a></div><figcaption>② カード10枚とまとめが保存された</figcaption></figure>
+    </div>
+    <div class="swipe">← 横にスワイプできるよ／画像を押すと大きく見られるよ</div>
+  </div>
+
+  <div class="step" data-no="7">
+    <div class="where app">予習サクッと</div>
+    <h2>「記録する」を押して終わり</h2>
+    <p class="sub" style="margin:0">かかった時間は自動で入る。連続日数や今日の予習時間がふえるよ。</p>
+    <div class="shots one">
+      <figure><div class="phone"><a href="demo/05-done.jpg"><img src="demo/05-done.jpg" alt="記録したあとの画面。連続日数1、今日の予習10分" width="600" height="1200" loading="lazy"></a></div><figcaption>今日の予習 10分！</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="total">この教科書1ページの予習にかかった時間<br><b>約10分</b><br><span class="sub">辞書で単語を調べる時間が、ほぼゼロになるよ</span></div>
+
+  <!-- ===== 電車で ===== -->
+  <div class="scene-head"><span class="icon">🚃</span><div><b>電車でクイズ</b><span>5分</span></div></div>
+  <div class="step" data-no="8">
+    <div class="where app">予習サクッと ›「🃏クイズ」</div>
+    <h2>保存したカードで単語クイズ</h2>
+    <p class="sub" style="margin:0">頭の中で答えてから「答えを見る」→「覚えた ○」か「まだ ×」。×のカードはまた出るよ。</p>
+    <div class="shots">
+      <figure><div class="phone"><a href="demo/07-quiz-q.jpg"><img src="demo/07-quiz-q.jpg" alt="単語クイズの問題。throw away と表示されている" width="600" height="1200" loading="lazy"></a></div><figcaption>① 意味を思い出す</figcaption></figure>
+      <figure><div class="phone"><a href="demo/08-quiz-a.jpg"><img src="demo/08-quiz-a.jpg" alt="単語クイズの答え。捨てる と表示され、まだ・覚えたのボタンがある" width="600" height="1200" loading="lazy"></a></div><figcaption>② 答えを見て○か×</figcaption></figure>
+    </div>
+    <div class="swipe">← 横にスワイプできるよ／画像を押すと大きく見られるよ</div>
+  </div>
+
+  <!-- ===== 授業前 ===== -->
+  <div class="scene-head"><span class="icon">⏰</span><div><b>授業の前にまとめ</b><span>5分</span></div></div>
+  <div class="step" data-no="9">
+    <div class="where app">予習サクッと ›「📝まとめ」</div>
+    <h2>ポイント3つを見返す</h2>
+    <p class="sub" style="margin:0">これを見ておけば、当てられても落ち着いて答えられる。</p>
+    <div class="shots one">
+      <figure><div class="phone"><a href="demo/09-notes.jpg"><img src="demo/09-notes.jpg" alt="授業前のまとめ画面。英語のポイントが3つ並んでいる" width="600" height="1200" loading="lazy"></a></div><figcaption>予習のポイントが3つ</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- ===== 続けると ===== -->
+  <div class="scene-head"><span class="icon">📊</span><div><b>1週間続けると…</b><span>記録画面</span></div></div>
+  <div class="step" data-no="10">
+    <div class="where app">予習サクッと ›「📊記録」</div>
+    <h2>予習時間がグラフで見える</h2>
+    <p class="sub" style="margin:0">点線が目標の30分。慣れるほど棒が短くなっていくのが目標だよ。</p>
+    <div class="shots one">
+      <figure><div class="phone"><a href="demo/11-log-week.jpg"><img src="demo/11-log-week.jpg" alt="記録画面。1週間分の予習時間の棒グラフ。最初は60分以上、だんだん30分前後に減っている" width="600" height="1200" loading="lazy"></a></div><figcaption>見本として1週間分の記録を入れた例</figcaption></figure>
+    </div>
+  </div>
+
+  <div style="display:grid;gap:10px;margin-top:32px">
+    <a class="btn" href="./">アプリを開く</a>
+    <a class="btn ghost" href="guide.html">使い方ガイド（最初の準備はこちら）</a>
+  </div>
+  <footer>まずは明日の英語で、1回だけ試してみよう。</footer>
+</div>
+</body>
+</html>
